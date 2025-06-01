@@ -1,4 +1,5 @@
 import React from 'react';
+import './KanjiList.css';
 import type { KanjiData } from '../types/kanji';
 
 function getKanjiStrokeGifUrl(kanji: string) {
@@ -21,24 +22,28 @@ const KanjiList: React.FC<KanjiListProps> = ({ results }) => {
         const gifUrl = getKanjiStrokeGifUrl(kanji.kanji);
         return (
           <div key={idx} className="kanji-card">
-            <h2>{kanji.kanji}</h2>
-            {gifUrl && (
-              <img src={gifUrl} alt={`${kanji.kanji} 획순`} style={{ width: 96, height: 96 }} />
-            )}
-            <div>음독: {kanji.readings.on.join(', ')}</div>
-            <div>훈독: {kanji.readings.kun.join(', ')}</div>
-            <div>의미: {kanji.meanings.join(', ')}</div>
-            <div>JLPT: {kanji.jlpt ?? '정보 없음'}</div>
-            <div>획수: {kanji.stroke_count}</div>
-            <div>
-              <strong>관련 단어:</strong>
-              <ul>
-                {kanji.related_words.map((word, i) => (
-                  <li key={i}>
-                    {word.word} ({word.reading}) - {word.meanings.join(', ')}
-                  </li>
-                ))}
-              </ul>
+            <div className="kanji-info">
+                  <h2>{kanji.kanji}</h2>
+                  <div className="stroke-gif">
+                    {gifUrl && (
+                      <img src={gifUrl} alt={`${kanji.kanji} 획순`}/>
+                    )}
+                  </div>
+                  <div className="kanji-readings on">음독: {kanji.readings.on.join(', ')}</div>
+                  <div className="kanji-readings kun">훈독: {kanji.readings.kun.join(', ')}</div>
+                  <div className="kanji-meanings">의미: {kanji.meanings.join(', ')}</div>
+                  <div className="kanji-jlpt">JLPT: {kanji.jlpt ?? '정보 없음'}</div>
+                  <div className="kanji-stroke-count">획수: {kanji.stroke_count}</div>
+                  <div className="kanji-related-words">
+                    <strong>관련 단어:</strong>
+                    <ul className="kanji-related-words-list">
+                      {kanji.related_words.map((word, i) => (
+                        <li key={i}>
+                          {word.word} ({word.reading}) - {word.meanings.join(', ')}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
             </div>
           </div>
         );

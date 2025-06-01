@@ -1,0 +1,25 @@
+.search-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+/* 
+.search-history-header h3 {
+  margin: 0;
+} */
+/* 
+.search-history-header .toggle-btn {
+  margin-right: 8px;
+} */
+
+.search-history-list ul li{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.search-history-list ul li .query{
+    font-size: 20px;
+}

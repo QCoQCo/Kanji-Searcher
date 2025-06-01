@@ -1,0 +1,66 @@
+.kanji-list {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  /* flex-wrap: wrap; */
+  margin: 24px 0;
+}
+
+.kanji-card {
+  background: #505050;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.04);
+  padding: 20px 24px;
+  min-width: 600px;
+  /* max-width: 660px; */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kanji-info {
+  width: 100%;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* .kanji-info ul{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+} */
+
+
+.kanji-info  h2 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.kanji-readings {
+  font-size: 1rem;
+}
+
+.kanji-meanings {
+  font-size: 1rem;
+}
+
+.kanji-jlpt, .kanji-stroke-count {
+  font-size: 0.95rem;
+}
+
+.kanji-related-words {
+  width: 100%;
+  text-align: left;
+}
+
+.kanji-related-words-list {
+  padding-left: 18px;
+}
+
+.kanji-related-words-list li {
+  font-size: 0.97rem;
+}

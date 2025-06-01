@@ -7,6 +7,7 @@ import { useJLPTFilter } from '../hooks/useJLPTFilter';
 import { useSearchHistory } from '../hooks/useSearchHistory';
 import { searchKanji, fetchKanjiInfo } from '../apis/jishoApi';
 import type { KanjiData, JLPTLevel } from '../types/kanji';
+import './SearchPage.css';
 
 function parseKanjiApiResponse(data: any): KanjiData {
   return {
