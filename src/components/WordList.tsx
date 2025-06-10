@@ -1,4 +1,5 @@
 import React from 'react';
+import './WordList.css';
 
 interface WordListProps {
   results: any[];
