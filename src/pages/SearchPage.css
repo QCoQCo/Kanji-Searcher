@@ -6,3 +6,50 @@
     flex-direction: column;
     gap: 20px; */
 }
+
+.keyboard-toggle-btn {
+    background: #404040 !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.keyboard-toggle-btn:hover {
+    background: #4a4a4a !important;
+    transform: translateY(-1px);
+}
+
+.keyboard-toggle-btn:active {
+    transform: translateY(0);
+}
+
+.keyboard-toggle-btn.active {
+    background: #00ff88 !important;
+    color: #000 !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1440px) {
+    .search-page {
+        width: 100%;
+        max-width: 1440px;
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-page {
+        padding: 0 16px;
+    }
+    
+    .keyboard-toggle-btn {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
+}
