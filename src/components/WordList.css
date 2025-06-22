@@ -14,9 +14,190 @@
     border-radius: 8px;
     padding: 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    background: #f9f9f9;
 }
 
 .word-card:hover {
     transform: translateY(-4px);
+}
+
+/* 클릭 가능한 카드 스타일 */
+.word-card.clickable {
+    cursor: pointer;
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.05);
+    position: relative;
+}
+
+/* 선택된 카드 스타일 */
+.word-card.selected {
+    border-color: #ff6b35;
+    background: rgba(255, 107, 53, 0.1);
+    box-shadow: 0 0 12px rgba(255, 107, 53, 0.3);
+    transform: translateY(-2px);
+}
+
+.word-card.selected:hover {
+    border-color: #ff5722;
+    background: rgba(255, 107, 53, 0.15);
+    box-shadow: 0 2px 16px rgba(255, 107, 53, 0.4);
+}
+
+.word-card.clickable:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
+    border-color: #00e67a;
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.word-card.clickable:active {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
+}
+
+/* 한자 섹션 스타일 */
+.kanji-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(0, 255, 136, 0.08);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 8px;
+}
+
+.kanji-hint {
+    font-size: 0.85rem;
+    color: #00b366;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.kanji-chars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.kanji-char-btn {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #00b366;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kanji-char-btn:hover {
+    background: rgba(0, 255, 136, 0.2);
+    border-color: rgba(0, 255, 136, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 255, 136, 0.2);
+}
+
+.kanji-char-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 255, 136, 0.3);
+}
+
+.kanji-all-btn {
+    background: rgba(255, 107, 53, 0.1);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ff6b35;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kanji-all-btn:hover {
+    background: rgba(255, 107, 53, 0.2);
+    border-color: rgba(255, 107, 53, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(255, 107, 53, 0.2);
+}
+
+.kanji-all-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(255, 107, 53, 0.3);
+}
+
+.word-card.clickable .kanji-section {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { background: rgba(0, 255, 136, 0.1); }
+    50% { background: rgba(0, 255, 136, 0.15); }
+    100% { background: rgba(0, 255, 136, 0.1); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1280px) {
+    .word-list {
+        width: 100%;
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .word-list {
+        padding: 0 16px;
+    }
+    
+    .word-card {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .word-list {
+        padding: 0 12px;
+    }
+    
+    .word-card {
+        padding: 12px;
+    }
+    
+    .kanji-section {
+        padding: 10px;
+    }
+    
+    .kanji-hint {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+    }
+    
+    .kanji-chars {
+        gap: 4px;
+    }
+    
+    .kanji-char-btn {
+        min-width: 32px;
+        height: 32px;
+        padding: 4px 8px;
+        font-size: 14px;
+    }
+    
+    .kanji-all-btn {
+        height: 32px;
+        padding: 4px 10px;
+        font-size: 12px;
+    }
 }

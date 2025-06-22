@@ -6,35 +6,138 @@ interface SearchHistoryProps {
   history: SearchHistoryItem[];
   onSelect: (query: string) => void;
   onClear: () => void;
+  onToggleFavorite: (query: string) => void;
+  getFrequentItems: () => SearchHistoryItem[];
+  getFavorites: () => SearchHistoryItem[];
 }
 
-const SearchHistory: React.FC<SearchHistoryProps> = ({ history, onSelect, onClear }) => {
+const SearchHistory: React.FC<SearchHistoryProps> = ({ 
+  history, 
+  onSelect, 
+  onClear, 
+  onToggleFavorite,
+  getFrequentItems,
+  getFavorites
+}) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<'recent' | 'frequent' | 'favorites'>('recent');
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'kanji': return '🔸';
+      case 'mixed': return '📝';
+      case 'word': return '💭';
+      default: return '🔍';
+    }
+  };
+
+  const renderHistoryItem = (item: SearchHistoryItem, index: number) => (
+    <li key={`${item.query}-${index}`} className="history-item">
+      <button 
+        className="history-item-btn"
+        onClick={() => onSelect(item.query)}
+        title={`검색: ${item.query} (${item.frequency}회 검색)`}
+      >
+        <div className="item-main">
+          <span className="item-icon">{getTypeIcon(item.type)}</span>
+          <span className="item-query">{item.query}</span>
+          {item.frequency > 1 && (
+            <span className="item-frequency">×{item.frequency}</span>
+          )}
+        </div>
+        <div className="item-meta">
+          <span className="item-timestamp">
+            {new Date(item.timestamp).toLocaleDateString()}
+          </span>
+        </div>
+      </button>
+      <button
+        className={`favorite-btn ${item.isFavorite ? 'active' : ''}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite(item.query);
+        }}
+        title={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+      >
+        {item.isFavorite ? '⭐' : '☆'}
+      </button>
+    </li>
+  );
+
+  const getCurrentItems = () => {
+    switch (activeTab) {
+      case 'frequent': return getFrequentItems();
+      case 'favorites': return getFavorites();
+      default: return history.slice(0, 10);
+    }
+  };
+
   return (
     <div className="search-history">
       <div className="search-history-header">
-        <h3>최근 검색어</h3>
-        <div>
+        <h3>🕐 검색 기록</h3>
+        <div className="header-controls">
           <button className="toggle-btn" onClick={() => setCollapsed(c => !c)}>
             {collapsed ? '펼치기' : '접기'}
           </button>
-          {!collapsed && <button onClick={onClear}>기록 삭제</button>}
+          {!collapsed && <button className="clear-btn" onClick={onClear}>전체 삭제</button>}
         </div>
       </div>
-      <div className="search-history-list">
-        {!collapsed && (
-          <ul>
-            {history.map((item, index) => (
-              <li key={index} onClick={() => onSelect(item.query)}>
-                <span className="query">{item.query}</span>
-                <span className="timestamp">
-                  {new Date(item.timestamp).toLocaleString()}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      
+      {!collapsed && (
+        <div className="search-history-content">
+          <div className="history-tabs">
+            <button 
+              className={`tab-btn ${activeTab === 'recent' ? 'active' : ''}`}
+              onClick={() => setActiveTab('recent')}
+            >
+              🕒 최근
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'frequent' ? 'active' : ''}`}
+              onClick={() => setActiveTab('frequent')}
+            >
+              🔥 인기
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
+              onClick={() => setActiveTab('favorites')}
+            >
+              ⭐ 즐겨찾기
+            </button>
+          </div>
+          
+          <div className="search-history-list">
+            {getCurrentItems().length > 0 ? (
+              <ul>
+                {getCurrentItems().map(renderHistoryItem)}
+              </ul>
+            ) : (
+              <div className="empty-state">
+                {activeTab === 'favorites' ? (
+                  <>
+                    <div className="empty-icon">⭐</div>
+                    <p>즐겨찾기한 검색어가 없습니다</p>
+                    <small>⭐ 버튼을 눌러 자주 사용하는 검색어를 저장하세요</small>
+                  </>
+                ) : activeTab === 'frequent' ? (
+                  <>
+                    <div className="empty-icon">🔥</div>
+                    <p>자주 검색한 항목이 없습니다</p>
+                    <small>같은 검색어를 여러 번 사용하면 여기에 표시됩니다</small>
+                  </>
+                ) : (
+                  <>
+                    <div className="empty-icon">🔍</div>
+                    <p>검색 기록이 없습니다</p>
+                    <small>검색을 시작하면 여기에 기록이 남습니다</small>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
