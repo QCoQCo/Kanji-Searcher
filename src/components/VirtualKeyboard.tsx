@@ -5,6 +5,7 @@ interface VirtualKeyboardProps {
   isVisible: boolean;
   inputBuffer: string;
   convertedText: string;
+  activeKey: string | null;
   onKeyPress: (key: string) => void;
   onBackspace: () => void;
   onClear: () => void;
@@ -16,6 +17,7 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
   isVisible,
   inputBuffer,
   convertedText,
+  activeKey,
   onKeyPress,
   onBackspace,
   onClear,
@@ -48,13 +50,17 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
           </button>
         </div>
         
+        <div className="keyboard-info">
+          <p>💡 물리 키보드로도 입력할 수 있습니다! (ESC키로 종료)</p>
+        </div>
+        
         <div className="keyboard-keys">
           {keyboardLayout.map((row, rowIndex) => (
             <div key={rowIndex} className="keyboard-row">
               {row.map((key) => (
                 <button
                   key={key}
-                  className="keyboard-key"
+                  className={`keyboard-key ${activeKey === key ? 'keyboard-key-active' : ''}`}
                   onClick={() => handleKeyClick(key)}
                 >
                   {key.toUpperCase()}
@@ -64,10 +70,16 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
           ))}
           
           <div className="keyboard-row keyboard-bottom-row">
-            <button className="keyboard-key keyboard-key-wide" onClick={onSpace}>
+            <button 
+              className={`keyboard-key keyboard-key-wide ${activeKey === ' ' ? 'keyboard-key-active' : ''}`} 
+              onClick={onSpace}
+            >
               SPACE
             </button>
-            <button className="keyboard-key" onClick={onBackspace}>
+            <button 
+              className={`keyboard-key ${activeKey === 'backspace' ? 'keyboard-key-active' : ''}`} 
+              onClick={onBackspace}
+            >
               ⌫
             </button>
             <button className="keyboard-key" onClick={onClear}>

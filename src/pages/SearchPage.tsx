@@ -241,6 +241,7 @@ const SearchPage: React.FC = () => {
         isVisible={keyboard.isVisible}
         inputBuffer={keyboard.inputBuffer}
         convertedText={keyboard.convertedText}
+        activeKey={keyboard.activeKey}
         onKeyPress={keyboard.addToBuffer}
         onBackspace={keyboard.backspace}
         onClear={keyboard.clear}

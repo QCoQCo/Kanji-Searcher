@@ -27,6 +27,22 @@
   padding-bottom: 15px;
 }
 
+.keyboard-info {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.keyboard-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #00ff88;
+  font-weight: 500;
+}
+
 .keyboard-display {
   background: #1a1a1a;
   border: 1px solid #444;
@@ -130,6 +146,31 @@
   color: #000;
   transform: translateY(0);
   box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+/* 물리 키보드로 누른 키 활성화 스타일 */
+.keyboard-key-active {
+  background: #00ff88 !important;
+  color: #000 !important;
+  border-color: #00e67a !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5) !important;
+  animation: keyPress 0.2s ease-out;
+}
+
+@keyframes keyPress {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  }
+  50% {
+    transform: scale(0.95);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+  }
 }
 
 .keyboard-key-wide {
