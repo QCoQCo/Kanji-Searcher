@@ -7,6 +7,12 @@
     gap: 20px; */
 }
 
+.search-page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+}
+
 .keyboard-toggle-btn {
     background: #404040 !important;
     color: #fff !important;
