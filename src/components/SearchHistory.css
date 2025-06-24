@@ -187,6 +187,30 @@
   color: #ffd700;
 }
 
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  color: #666;
+  font-weight: bold;
+}
+
+.remove-btn:hover {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  transform: scale(1.1);
+}
+
 .empty-state {
   text-align: center;
   padding: 40px 20px;

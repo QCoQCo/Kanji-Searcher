@@ -9,6 +9,7 @@ interface SearchHistoryProps {
   onToggleFavorite: (query: string) => void;
   getFrequentItems: () => SearchHistoryItem[];
   getFavorites: () => SearchHistoryItem[];
+  onRemove: (query: string) => void;
 }
 
 const SearchHistory: React.FC<SearchHistoryProps> = ({ 
@@ -17,7 +18,8 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
   onClear, 
   onToggleFavorite,
   getFrequentItems,
-  getFavorites
+  getFavorites,
+  onRemove
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'recent' | 'frequent' | 'favorites'>('recent');
@@ -51,16 +53,28 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
           </span>
         </div>
       </button>
-      <button
-        className={`favorite-btn ${item.isFavorite ? 'active' : ''}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleFavorite(item.query);
-        }}
-        title={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
-      >
-        {item.isFavorite ? '⭐' : '☆'}
-      </button>
+      <div className="item-actions">
+        <button
+          className={`favorite-btn ${item.isFavorite ? 'active' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite(item.query);
+          }}
+          title={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+        >
+          {item.isFavorite ? '⭐' : '☆'}
+        </button>
+        <button
+          className="remove-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(item.query);
+          }}
+          title="검색 기록에서 삭제"
+        >
+          ✕
+        </button>
+      </div>
     </li>
   );
 

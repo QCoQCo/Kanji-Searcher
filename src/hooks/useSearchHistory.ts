@@ -70,12 +70,21 @@ export const useSearchHistory = () => {
     return history.filter(item => item.isFavorite);
   };
 
+  const removeFromHistory = (query: string) => {
+    setHistory(prev => {
+      const newHistory = prev.filter(item => item.query !== query);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+      return newHistory;
+    });
+  };
+
   return { 
     history, 
     addToHistory, 
     clearHistory, 
     toggleFavorite,
     getFrequentItems,
-    getFavorites
+    getFavorites,
+    removeFromHistory
   };
 }; 
