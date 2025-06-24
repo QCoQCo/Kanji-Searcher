@@ -39,7 +39,17 @@ const SearchPage: React.FC = () => {
   const [selectedWord, setSelectedWord] = useState<any>(null);
   const [searchSource, setSearchSource] = useState<'manual' | 'word-click'>('manual');
   const { selectedLevels, onLevelChange, getActiveLevels } = useJLPTFilter();
-  const { history, addToHistory, clearHistory, toggleFavorite, getFrequentItems, getFavorites, removeFromHistory } = useSearchHistory();
+  const { 
+    history, 
+    addToHistory, 
+    clearHistory, 
+    toggleFavorite, 
+    getFrequentItems, 
+    getFavorites, 
+    removeFromHistory, 
+    exportHistoryToJSON, 
+    importHistoryFromJSON,
+  } = useSearchHistory();
   const keyboard = useVirtualKeyboard();
   const breadcrumb = useBreadcrumb();
 
@@ -182,6 +192,8 @@ const SearchPage: React.FC = () => {
         getFrequentItems={getFrequentItems}
         getFavorites={getFavorites}
         onRemove={removeFromHistory}
+        onExport={exportHistoryToJSON}
+        onImport={importHistoryFromJSON}
       />
       <Breadcrumb 
         items={breadcrumb.breadcrumbItems} 

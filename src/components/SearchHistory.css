@@ -26,6 +26,8 @@
 .header-controls {
   display: flex;
   gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .toggle-btn, .clear-btn {
@@ -52,6 +54,38 @@
 
 .clear-btn:hover {
   background: rgba(255, 71, 87, 0.3);
+}
+
+.import-export-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.export-btn, .import-btn {
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #00ff88;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-btn:hover, .import-btn:hover {
+  background: rgba(0, 255, 136, 0.3);
+  transform: translateY(-1px);
+}
+
+.import-mode-select {
+  background: rgba(100, 100, 100, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 10px;
+  color: #ccc;
+  cursor: pointer;
 }
 
 .search-history-content {
@@ -248,6 +282,16 @@
   
   .search-history-header h3 {
     font-size: 14px;
+  }
+  
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  
+  .import-export-controls {
+    justify-content: space-between;
   }
   
   .history-tabs {

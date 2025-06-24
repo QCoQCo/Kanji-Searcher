@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './SearchHistory.css';
 import type { SearchHistoryItem } from '../hooks/useSearchHistory';
 
@@ -10,6 +10,8 @@ interface SearchHistoryProps {
   getFrequentItems: () => SearchHistoryItem[];
   getFavorites: () => SearchHistoryItem[];
   onRemove: (query: string) => void;
+  onExport: () => void;
+  onImport: (file: File, mergeMode: 'replace' | 'merge') => Promise<boolean>;
 }
 
 const SearchHistory: React.FC<SearchHistoryProps> = ({ 
@@ -19,10 +21,14 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
   onToggleFavorite,
   getFrequentItems,
   getFavorites,
-  onRemove
+  onRemove,
+  onExport,
+  onImport
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<'recent' | 'frequent' | 'favorites'>('recent');
+  const [importMode, setImportMode] = useState<'merge' | 'replace'>('merge');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -86,6 +92,25 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
     }
   };
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const success = await onImport(file, importMode);
+    if (success) {
+      alert(`검색 기록을 성공적으로 ${importMode === 'merge' ? '병합' : '대체'}했습니다.`);
+    }
+    
+    // 파일 입력 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="search-history">
       <div className="search-history-header">
@@ -94,9 +119,38 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
           <button className="toggle-btn" onClick={() => setCollapsed(c => !c)}>
             {collapsed ? '펼치기' : '접기'}
           </button>
-          {!collapsed && <button className="clear-btn" onClick={onClear}>전체 삭제</button>}
+          {!collapsed && (
+            <>
+              <div className="import-export-controls">
+                <button className="export-btn" onClick={onExport} title="검색 기록 내보내기">
+                  📤 내보내기
+                </button>
+                <button className="import-btn" onClick={handleImportClick} title="검색 기록 가져오기">
+                  📥 가져오기
+                </button>
+                <select 
+                  className="import-mode-select"
+                  value={importMode} 
+                  onChange={(e) => setImportMode(e.target.value as 'merge' | 'replace')}
+                  title="가져오기 모드"
+                >
+                  <option value="merge">병합</option>
+                  <option value="replace">대체</option>
+                </select>
+              </div>
+              <button className="clear-btn" onClick={onClear}>전체 삭제</button>
+            </>
+          )}
         </div>
       </div>
+      
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
       
       {!collapsed && (
         <div className="search-history-content">
