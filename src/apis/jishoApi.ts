@@ -25,6 +25,11 @@ export const searchKanji = async (keyword: string) => {
 };
 
 export const fetchKanjiInfo = async (kanji: string) => {
-  const response = await axios.get(`https://kanjiapi.dev/v1/kanji/${encodeURIComponent(kanji)}`);
-  return response.data;
+  try {
+    const response = await axios.get(`https://kanjiapi.dev/v1/kanji/${encodeURIComponent(kanji)}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching kanji info for ${kanji}:`, error);
+    throw error;
+  }
 }; 

@@ -14,10 +14,14 @@ interface WordListProps {
 const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleWordClick = (item: any) => {
-    if (onWordClick) {
-      const extractedKanji = extractKanjiFromWordObject(item);
-      if (extractedKanji) {
-        onWordClick(item, extractedKanji);
+    if (onWordClick && item) {
+      try {
+        const extractedKanji = extractKanjiFromWordObject(item);
+        if (extractedKanji && extractedKanji.length > 0) {
+          onWordClick(item, extractedKanji);
+        }
+      } catch (error) {
+        console.error('Error handling word click:', error);
       }
     }
   };
@@ -39,12 +43,12 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
             className={`word-card ${isClickable ? 'clickable' : ''} ${isSelected ? 'selected' : ''}`}
             onClick={() => isClickable && handleWordClick(item)}
           >
-            <h2>{item.japanese[0]?.word || item.japanese[0]?.reading}</h2>
+            <h2>{item.japanese?.[0]?.word || item.japanese?.[0]?.reading || '읽기 없음'}</h2>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <div>읽기: {item.japanese.map((j: any) => j.reading).join(', ')}</div>
+            <div>읽기: {item.japanese?.map((j: any) => j.reading).filter(Boolean).join(', ') || '읽기 없음'}</div>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <div>의미: {item.senses.flatMap((sense: any) => sense.english_definitions).join(', ')}</div>
-            <div>JLPT: {item.jlpt[0] ?? '정보 없음'}</div>
+            <div>의미: {item.senses?.flatMap((sense: any) => sense.english_definitions || []).filter(Boolean).join(', ') || '의미 없음'}</div>
+            <div>JLPT: {item.jlpt?.[0] ?? '정보 없음'}</div>
             {isClickable && (
               <div className="kanji-section">
                 <div className="kanji-hint">

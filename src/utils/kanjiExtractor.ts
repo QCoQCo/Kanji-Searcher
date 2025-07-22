@@ -42,18 +42,24 @@ export function getUniqueKanjiString(text: string): string {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function extractKanjiFromWordObject(wordObj: any): string {
+  if (!wordObj || typeof wordObj !== 'object') {
+    return '';
+  }
+  
   let kanjiText = '';
   
   // japanese 배열에서 word 또는 reading 확인
   if (wordObj.japanese && Array.isArray(wordObj.japanese)) {
     for (const jpItem of wordObj.japanese) {
-      // word가 있으면 word에서 한자 추출 (우선순위)
-      if (jpItem.word) {
-        kanjiText += jpItem.word;
-      }
-      // word가 없고 reading에 한자가 있으면 reading에서 추출
-      else if (jpItem.reading) {
-        kanjiText += jpItem.reading;
+      if (jpItem && typeof jpItem === 'object') {
+        // word가 있으면 word에서 한자 추출 (우선순위)
+        if (jpItem.word && typeof jpItem.word === 'string') {
+          kanjiText += jpItem.word;
+        }
+        // word가 없고 reading에 한자가 있으면 reading에서 추출
+        else if (jpItem.reading && typeof jpItem.reading === 'string') {
+          kanjiText += jpItem.reading;
+        }
       }
     }
   }

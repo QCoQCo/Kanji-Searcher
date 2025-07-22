@@ -62,25 +62,35 @@ const SearchPage: React.FC = () => {
     try {
       // word-click이 아닌 경우에만 WordList 검색 (무한 루프 방지)
       if (source !== 'word-click') {
-        const data = await searchKanji(searchTerm);
-        setWordResults(data.data);
+        try {
+          const data = await searchKanji(searchTerm);
+          setWordResults(data.data || []);
+        } catch (wordError) {
+          console.error('Error searching words:', wordError);
+          setWordResults([]);
+        }
       }
       
       // KanjiList: 각 글자별 한자 정보 검색 (kanjiapi.dev)
       const kanjiChars = Array.from(searchTerm).filter(ch => /[一-龯々]/.test(ch));
       const kanjiDataArr: KanjiData[] = [];
-      for (const ch of kanjiChars) {
-        try {
-          const res = await fetchKanjiInfo(ch);
-          const parsed = parseKanjiApiResponse(res);
-          const activeLevels = getActiveLevels();
-          if (!parsed.jlpt || activeLevels.includes(parsed.jlpt)) {
-            kanjiDataArr.push(parsed);
+      
+      if (kanjiChars.length > 0) {
+        for (const ch of kanjiChars) {
+          try {
+            const res = await fetchKanjiInfo(ch);
+            const parsed = parseKanjiApiResponse(res);
+            const activeLevels = getActiveLevels();
+            if (!parsed.jlpt || activeLevels.includes(parsed.jlpt)) {
+              kanjiDataArr.push(parsed);
+            }
+          } catch (kanjiError) {
+            console.error(`Error fetching kanji info for ${ch}:`, kanjiError);
+            // 에러가 발생해도 다른 한자는 계속 처리
           }
-        } catch {
-          console.error(`Error fetching kanji info for ${ch}`);
         }
       }
+      
       setKanjiResults(kanjiDataArr);
       
       // 검색 히스토리에 추가 (manual 검색시에만)
@@ -88,7 +98,8 @@ const SearchPage: React.FC = () => {
         addToHistory(searchTerm);
         breadcrumb.addBreadcrumbItem(searchTerm, 'manual');
       }
-    } catch {
+    } catch (error) {
+      console.error('Search error:', error);
       setKanjiResults([]);
       if (source !== 'word-click') {
         setWordResults([]);

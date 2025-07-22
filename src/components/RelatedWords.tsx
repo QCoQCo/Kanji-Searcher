@@ -55,7 +55,7 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
         .filter(word => {
           // JLPT 레벨 필터링
           if (currentJLPTLevels.length > 0) {
-            return word.jlpt && word.jlpt.some((level: string) => 
+            return word.jlpt && Array.isArray(word.jlpt) && word.jlpt.some((level: string) => 
               currentJLPTLevels.includes(level)
             );
           }
@@ -74,9 +74,15 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleWordClick = (word: any) => {
-    const extractedKanji = extractKanjiFromWordObject(word);
-    if (extractedKanji) {
-      onWordClick(word, extractedKanji);
+    if (!word) return;
+    
+    try {
+      const extractedKanji = extractKanjiFromWordObject(word);
+      if (extractedKanji && extractedKanji.length > 0) {
+        onWordClick(word, extractedKanji);
+      }
+    } catch (error) {
+      console.error('Error handling related word click:', error);
     }
   };
 
@@ -122,16 +128,16 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
                     onClick={() => handleWordClick(word)}
                   >
                     <div className="rec-word">
-                      {word.japanese[0]?.word || word.japanese[0]?.reading}
+                      {word.japanese?.[0]?.word || word.japanese?.[0]?.reading || '읽기 없음'}
                     </div>
                     <div className="rec-reading">
-                      {word.japanese[0]?.reading}
+                      {word.japanese?.[0]?.reading || '읽기 없음'}
                     </div>
                     <div className="rec-meaning">
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {word.senses.flatMap((sense: any) => sense.english_definitions).slice(0, 2).join(', ')}
+                      {word.senses?.flatMap((sense: any) => sense.english_definitions || []).filter(Boolean).slice(0, 2).join(', ') || '의미 없음'}
                     </div>
-                    {word.jlpt[0] && (
+                    {word.jlpt?.[0] && (
                       <span className="rec-jlpt">{word.jlpt[0]}</span>
                     )}
                   </button>
