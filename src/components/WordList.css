@@ -15,7 +15,24 @@
     padding: 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease-in-out;
-    background: #f9f9f9;
+    background: #404040;
+    color: #fff;
+}
+
+.word-card h2{
+    color: #fff;
+}
+
+/* 에러 카드 스타일 */
+.word-card.error {
+    border-color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+    color: #ff4444;
+}
+
+.word-card.error h2 {
+    color: #ff4444;
+    margin-bottom: 8px;
 }
 
 .word-card:hover {

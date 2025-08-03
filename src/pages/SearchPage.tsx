@@ -10,34 +10,12 @@ import { useJLPTFilter } from '../hooks/useJLPTFilter';
 import { useSearchHistory } from '../hooks/useSearchHistory';
 import { useVirtualKeyboard } from '../hooks/useVirtualKeyboard';
 import { useBreadcrumb } from '../hooks/useBreadcrumb';
-import { searchKanji, fetchKanjiInfo } from '../apis/jishoApi';
-import type { KanjiData, JLPTLevel } from '../types/kanji';
+import { useSearch } from '../hooks/useSearch';
+import type { WordData } from '../types/kanji';
 import './SearchPage.css';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseKanjiApiResponse(data: any): KanjiData {
-  return {
-    kanji: data.kanji,
-    readings: {
-      kun: data.kun_readings || [],
-      on: data.on_readings || [],
-    },
-    meanings: data.meanings || [],
-    jlpt: data.jlpt ? (`N${data.jlpt}` as JLPTLevel) : null,
-    stroke_count: data.stroke_count || 0,
-    related_words: [],
-  };
-}
 
 const SearchPage: React.FC = () => {
   const [query, setQuery] = useState('');
-  const [kanjiResults, setKanjiResults] = useState<KanjiData[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [wordResults, setWordResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [selectedWord, setSelectedWord] = useState<any>(null);
-  const [searchSource, setSearchSource] = useState<'manual' | 'word-click'>('manual');
   const { selectedLevels, onLevelChange, getActiveLevels } = useJLPTFilter();
   const { 
     history, 
@@ -52,67 +30,25 @@ const SearchPage: React.FC = () => {
   } = useSearchHistory();
   const keyboard = useVirtualKeyboard();
   const breadcrumb = useBreadcrumb();
-
-  const handleSearch = async (q?: string, source: 'manual' | 'word-click' = 'manual') => {
-    const searchTerm = q ?? query;
-    if (!searchTerm) return;
-    setLoading(true);
-    setSearchSource(source);
-    
-    try {
-      // word-click이 아닌 경우에만 WordList 검색 (무한 루프 방지)
-      if (source !== 'word-click') {
-        try {
-          const data = await searchKanji(searchTerm);
-          setWordResults(data.data || []);
-        } catch (wordError) {
-          console.error('Error searching words:', wordError);
-          setWordResults([]);
-        }
-      }
-      
-      // KanjiList: 각 글자별 한자 정보 검색 (kanjiapi.dev)
-      const kanjiChars = Array.from(searchTerm).filter(ch => /[一-龯々]/.test(ch));
-      const kanjiDataArr: KanjiData[] = [];
-      
-      if (kanjiChars.length > 0) {
-        for (const ch of kanjiChars) {
-          try {
-            const res = await fetchKanjiInfo(ch);
-            const parsed = parseKanjiApiResponse(res);
-            const activeLevels = getActiveLevels();
-            if (!parsed.jlpt || activeLevels.includes(parsed.jlpt)) {
-              kanjiDataArr.push(parsed);
-            }
-          } catch (kanjiError) {
-            console.error(`Error fetching kanji info for ${ch}:`, kanjiError);
-            // 에러가 발생해도 다른 한자는 계속 처리
-          }
-        }
-      }
-      
-      setKanjiResults(kanjiDataArr);
-      
-      // 검색 히스토리에 추가 (manual 검색시에만)
-      if (source === 'manual') {
-        addToHistory(searchTerm);
-        breadcrumb.addBreadcrumbItem(searchTerm, 'manual');
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      setKanjiResults([]);
-      if (source !== 'word-click') {
-        setWordResults([]);
-      }
-    } finally {
-      setLoading(false);
+  
+  const {
+    kanjiResults,
+    wordResults,
+    loading,
+    selectedWord,
+    searchSource,
+    handleSearch,
+    handleWordClick,
+    handleManualSearch,
+  } = useSearch(getActiveLevels, (query, source) => {
+    if (source === 'manual') {
+      addToHistory(query);
+      breadcrumb.addBreadcrumbItem(query, 'manual');
     }
-  };
+  });
 
   // Word card 클릭 핸들러
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleWordClick = (wordObj: any, extractedKanji: string) => {
-    setSelectedWord(wordObj);
+  const handleWordClickWrapper = (wordObj: WordData, extractedKanji: string) => {
     setQuery(extractedKanji);
     
     // 브레드크럼에 추가
@@ -123,7 +59,7 @@ const SearchPage: React.FC = () => {
       wordObj
     );
     
-    handleSearch(extractedKanji, 'word-click');
+    handleWordClick(wordObj, extractedKanji);
     
     // 한자 결과로 스크롤 (검색 완료 후)
     setTimeout(() => {
@@ -135,9 +71,8 @@ const SearchPage: React.FC = () => {
   };
 
   // 새로운 manual 검색 시 선택된 word 초기화
-  const handleManualSearch = (q?: string) => {
-    setSelectedWord(null);
-    handleSearch(q, 'manual');
+  const handleManualSearchWrapper = (q?: string) => {
+    handleManualSearch(q);
   };
 
   // 브레드크럼 네비게이션 핸들러
@@ -176,7 +111,7 @@ const SearchPage: React.FC = () => {
           placeholder="Search for a kanji or word"
           onKeyDown={(e) => { if (e.key === 'Enter') handleManualSearch(); }}
         />
-        <button onClick={() => handleManualSearch()}>Search</button>
+        <button className="search-btn" onClick={() => handleManualSearchWrapper()}>Search</button>
         <button 
           className="keyboard-toggle-btn"
           onClick={keyboard.toggleKeyboard}
@@ -247,7 +182,7 @@ const SearchPage: React.FC = () => {
                 <h2>📚 관련 단어</h2>
                 <span className="result-count">{wordResults.length}개 단어</span>
               </div>
-              <WordList results={wordResults} onWordClick={handleWordClick} selectedWord={selectedWord} />
+              <WordList results={wordResults} onWordClick={handleWordClickWrapper} selectedWord={selectedWord} />
             </div>
           )}
           

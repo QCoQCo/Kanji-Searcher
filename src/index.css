@@ -1,4 +1,4 @@
-:root {
+/* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -58,4 +58,37 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+} */
+@charset "utf-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #121212;
+    background-color: #000;
+}
+ul,li{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+a{
+    text-decoration: none;
+}
+img,input,button{
+    vertical-align: top;
+}
+input,button{
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
+}
+button{
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
 }

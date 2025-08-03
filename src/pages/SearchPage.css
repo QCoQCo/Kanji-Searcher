@@ -13,21 +13,38 @@
     color: #fff;
 }
 
+.search-page .search-btn{
+    background: #404040;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    &:hover{
+        background: #4a4a4a;
+        transform: translateY(-1px);
+    }
+}
+
 .keyboard-toggle-btn {
-    background: #404040 !important;
-    color: #fff !important;
-    border: 1px solid #555 !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    transition: all 0.2s ease !important;
+    background: #404040;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
 .keyboard-toggle-btn:hover {
-    background: #4a4a4a !important;
+    background: #4a4a4a;
     transform: translateY(-1px);
 }
 
@@ -36,8 +53,8 @@
 }
 
 .keyboard-toggle-btn.active {
-    background: #00ff88 !important;
-    color: #000 !important;
+    background: #00ff88;
+    color: #000;
 }
 
 /* 로딩 상태 스타일 */

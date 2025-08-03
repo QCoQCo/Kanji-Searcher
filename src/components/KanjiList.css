@@ -8,10 +8,11 @@
 }
 
 .kanji-card {
-  background: #505050;
-  border: 1px solid #ffffff;
+  background: #404040;
+  border: 1px solid #555;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.04);
+  color: #fff;
   padding: 20px 24px;
   min-width: 600px;
   /* max-width: 660px; */

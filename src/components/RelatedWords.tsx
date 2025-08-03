@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './RelatedWords.css';
 import { searchKanji } from '../apis/jishoApi';
 import { extractKanjiFromWordObject, hasKanji } from '../utils/kanjiExtractor';
+import type { WordData } from '../types/kanji';
 
 interface RelatedWordsProps {
   currentKanji: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onWordClick: (wordObj: any, extractedKanji: string) => void;
+  onWordClick: (wordObj: WordData, extractedKanji: string) => void;
   currentJLPTLevels: string[];
 }
 
@@ -15,8 +15,7 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
   onWordClick, 
   currentJLPTLevels 
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<WordData[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'kanji' | 'jlpt'>('kanji');
 
@@ -177,7 +176,7 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {word.senses.flatMap((sense: any) => sense.english_definitions).slice(0, 2).join(', ')}
                       </div>
-                      <span className="rec-jlpt">{word.jlpt[0]}</span>
+                      <span className="rec-jlpt">{word.jlpt?.[0]}</span>
                     </button>
                   ))
                 }

@@ -12,6 +12,39 @@ interface WordListProps {
 }
 
 const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord }) => {
+  // 디버깅: 첫 번째 결과의 구조 확인
+  // React.useEffect(() => {
+  //   if (results.length > 0) {
+  //     console.log('WordList - First result structure:', results[0]);
+  //     console.log('WordList - All results:', results);
+  //   }
+  // }, [results]);
+
+  // 테스트용 mock 데이터 (API가 작동하지 않을 때 사용)
+  // const mockData = [
+  //   {
+  //     japanese: [
+  //       { word: '水', reading: 'みず' }
+  //     ],
+  //     senses: [
+  //       { english_definitions: ['water'] }
+  //     ],
+  //     jlpt: ['N5']
+  //   },
+  //   {
+  //     japanese: [
+  //       { word: '水曜日', reading: 'すいようび' }
+  //     ],
+  //     senses: [
+  //       { english_definitions: ['Wednesday'] }
+  //     ],
+  //     jlpt: ['N5']
+  //   }
+  // ];
+
+  // API 결과가 없으면 mock 데이터 사용 (테스트용)
+  // const displayResults = results.length > 0 ? results : mockData;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleWordClick = (item: any) => {
     if (onWordClick && item) {
@@ -31,11 +64,31 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
   return (
     <div className="word-list">
       {results.map((item, idx) => {
+        // 데이터 구조 검증
+        if (!item || typeof item !== 'object') {
+          console.warn(`Invalid item at index ${idx}:`, item);
+          return (
+            <div key={idx} className="word-card error">
+              <h2>❌ 잘못된 데이터</h2>
+              <div>데이터 구조가 올바르지 않습니다.</div>
+            </div>
+          );
+        }
+
         const kanjiText = extractKanjiFromWordObject(item);
         const isClickable = hasKanji(kanjiText);
         const isSelected = selectedWord && 
           (selectedWord.japanese?.[0]?.word === item.japanese?.[0]?.word ||
            selectedWord.japanese?.[0]?.reading === item.japanese?.[0]?.reading);
+        
+        // 디버깅: 각 아이템의 데이터 확인
+        // console.log(`Item ${idx}:`, {
+        //   japanese: item.japanese,
+        //   senses: item.senses,
+        //   jlpt: item.jlpt,
+        //   kanjiText,
+        //   isClickable
+        // });
         
         return (
           <div 
