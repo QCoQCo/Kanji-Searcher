@@ -86,6 +86,7 @@ img,input,button{
 }
 input,button{
     font-family: "Pretendard Variable", Pretendard, sans-serif;
+    color: #fff;
 }
 button{
     border: none;

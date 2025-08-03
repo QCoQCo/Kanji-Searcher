@@ -72,7 +72,7 @@ const SearchPage: React.FC = () => {
 
   // 새로운 manual 검색 시 선택된 word 초기화
   const handleManualSearchWrapper = (q?: string) => {
-    handleManualSearch(q);
+    handleManualSearch(q || query);
   };
 
   // 브레드크럼 네비게이션 핸들러
@@ -109,7 +109,7 @@ const SearchPage: React.FC = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for a kanji or word"
-          onKeyDown={(e) => { if (e.key === 'Enter') handleManualSearch(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleManualSearchWrapper(); }}
         />
         <button className="search-btn" onClick={() => handleManualSearchWrapper()}>Search</button>
         <button 
