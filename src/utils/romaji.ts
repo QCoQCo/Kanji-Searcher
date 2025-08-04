@@ -32,6 +32,7 @@ const SPECIAL_COMBINATIONS: Record<string, string> = {
   'ya': 'や',
   'yu': 'ゆ',
   'yo': 'よ',
+  'ji': 'じ',
   'n': 'ん'
 };
 
