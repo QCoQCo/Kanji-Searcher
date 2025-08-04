@@ -78,6 +78,6 @@ npm run build
 
 ### CORS 오류
 
-Netlify Functions를 통해 CORS 문제를 해결했습니다. 만약 여전히 문제가 있다면:
+Netlify Functions를 통해 CORS 문제를 해결. 만약 여전히 문제가 있다면:
 1. `netlify.toml` 파일이 올바르게 설정되었는지 확인
 2. Functions가 제대로 배포되었는지 확인

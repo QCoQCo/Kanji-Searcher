@@ -14,10 +14,10 @@ interface SearchHistoryProps {
   onImport: (file: File, mergeMode: 'replace' | 'merge') => Promise<boolean>;
 }
 
-const SearchHistory: React.FC<SearchHistoryProps> = ({ 
-  history, 
-  onSelect, 
-  onClear, 
+const SearchHistory: React.FC<SearchHistoryProps> = ({
+  history,
+  onSelect,
+  onClear,
   onToggleFavorite,
   getFrequentItems,
   getFavorites,
@@ -41,7 +41,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
 
   const renderHistoryItem = (item: SearchHistoryItem, index: number) => (
     <li key={`${item.query}-${index}`} className="history-item">
-      <button 
+      <button
         className="history-item-btn"
         onClick={() => onSelect(item.query)}
         title={`검색: ${item.query} (${item.frequency}회 검색)`}
@@ -73,8 +73,10 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
         <button
           className="remove-btn"
           onClick={(e) => {
-            e.stopPropagation();
-            onRemove(item.query);
+            if (window.confirm('정말 삭제하시겠습니까?')) {
+              e.stopPropagation();
+              onRemove(item.query);
+            }
           }}
           title="검색 기록에서 삭제"
         >
@@ -104,7 +106,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
     if (success) {
       alert(`검색 기록을 성공적으로 ${importMode === 'merge' ? '병합' : '대체'}했습니다.`);
     }
-    
+
     // 파일 입력 초기화
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -128,9 +130,9 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
                 <button className="import-btn" onClick={handleImportClick} title="검색 기록 가져오기">
                   📥 가져오기
                 </button>
-                <select 
+                <select
                   className="import-mode-select"
-                  value={importMode} 
+                  value={importMode}
                   onChange={(e) => setImportMode(e.target.value as 'merge' | 'replace')}
                   title="가져오기 모드"
                 >
@@ -138,12 +140,16 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
                   <option value="replace">대체</option>
                 </select>
               </div>
-              <button className="clear-btn" onClick={onClear}>전체 삭제</button>
+              <button className="clear-btn" onClick={() => {
+                if(window.confirm('정말 삭제하시겠습니까?')) {
+                  onClear();
+                }
+              }}>전체 삭제</button>
             </>
           )}
         </div>
       </div>
-      
+
       <input
         ref={fileInputRef}
         type="file"
@@ -151,30 +157,30 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
-      
+
       {!collapsed && (
         <div className="search-history-content">
           <div className="history-tabs">
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'recent' ? 'active' : ''}`}
               onClick={() => setActiveTab('recent')}
             >
               🕒 최근
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'frequent' ? 'active' : ''}`}
               onClick={() => setActiveTab('frequent')}
             >
               🔥 인기
             </button>
-            <button 
+            <button
               className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
               onClick={() => setActiveTab('favorites')}
             >
               ⭐ 즐겨찾기
             </button>
           </div>
-          
+
           <div className="search-history-list">
             {getCurrentItems().length > 0 ? (
               <ul>
