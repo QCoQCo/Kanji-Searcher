@@ -26,9 +26,12 @@ const CONSONANT_VOWEL_COMBINATIONS: Record<string, Record<string, string>> = {
 // 특수 조합 매핑
 const SPECIAL_COMBINATIONS: Record<string, string> = {
   'fu': 'ふ',
-  'dji': 'ぢ',
-  'dzu': 'づ',
+  'di': 'ぢ',
+  'du': 'づ',
   'xtu': 'っ',
+  'ya': 'や',
+  'yu': 'ゆ',
+  'yo': 'よ',
   'n': 'ん'
 };
 
