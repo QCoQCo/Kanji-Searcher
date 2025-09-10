@@ -1,11 +1,11 @@
 .word-list {
-  width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+    width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .word-card {
@@ -19,7 +19,7 @@
     color: #fff;
 }
 
-.word-card h2{
+.word-card h2 {
     color: #fff;
 }
 
@@ -159,9 +159,15 @@
 }
 
 @keyframes pulse {
-    0% { background: rgba(0, 255, 136, 0.1); }
-    50% { background: rgba(0, 255, 136, 0.15); }
-    100% { background: rgba(0, 255, 136, 0.1); }
+    0% {
+        background: rgba(0, 255, 136, 0.1);
+    }
+    50% {
+        background: rgba(0, 255, 136, 0.15);
+    }
+    100% {
+        background: rgba(0, 255, 136, 0.1);
+    }
 }
 
 /* 반응형 디자인 */
@@ -176,7 +182,7 @@
     .word-list {
         padding: 0 16px;
     }
-    
+
     .word-card {
         width: 100%;
         max-width: 320px;
@@ -187,31 +193,31 @@
     .word-list {
         padding: 0 12px;
     }
-    
+
     .word-card {
         padding: 12px;
     }
-    
+
     .kanji-section {
         padding: 10px;
     }
-    
+
     .kanji-hint {
         font-size: 0.8rem;
         margin-bottom: 6px;
     }
-    
+
     .kanji-chars {
         gap: 4px;
     }
-    
+
     .kanji-char-btn {
         min-width: 32px;
         height: 32px;
         padding: 4px 8px;
         font-size: 14px;
     }
-    
+
     .kanji-all-btn {
         height: 32px;
         padding: 4px 10px;
