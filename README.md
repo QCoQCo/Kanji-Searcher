@@ -1,6 +1,7 @@
 # Kanji Searcher / 漢字検索
 
 <p align="center">
+  <strong>🔗 <a href="https://kanji-jisyo.netlify.app/">Live Demo (배포 링크 / デモサイト)</a></strong><br><br>
   <strong>언어 선택 / 言語選択</strong><br>
   <a href="#korean">🇰🇷 한국어</a> · <a href="#japanese">🇯🇵 日本語</a>
 </p>
@@ -14,6 +15,8 @@
 ### 소개
 
 일본어 한자 학습을 위한 검색 도구입니다. Jisho API와 Kanji API를 활용하여 한자와 단어를 검색할 수 있습니다.
+
+**[🌐 배포 사이트](https://kanji-jisyo.netlify.app/)**
 
 ### 주요 기능
 
@@ -97,6 +100,8 @@ Netlify Functions를 통해 CORS 문제를 해결합니다. 여전히 문제가 
 ### 概要
 
 日本語漢字学習のための検索ツールです。Jisho API と Kanji API を活用して、漢字と単語を検索できます。
+
+**[🌐 デモサイト](https://kanji-jisyo.netlify.app/)**
 
 ### 主な機能
 
