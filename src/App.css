@@ -1,45 +1,43 @@
-*{
+* {
     padding: 0;
     margin: 0;
     /* box-sizing: border-box; */
 }
 
-body{
+body {
     font-size: 16px;
     line-height: 1.5;
 }
 
-ul, li{
+ul,
+li {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-a{
+a {
     text-decoration: none;
     color: inherit;
 }
 
-button,input,textarea{
+button,
+input,
+textarea {
     border: none;
     background: none;
     outline: none;
 }
 
-button{
+button {
     cursor: pointer;
 }
 
 #wrapper {
-  /* min-width: 320px; */
-  width: 100%;
-  background-color: #000;
-  /* min-height: 100vh; */
-  /* box-sizing: border-box; */
-  /* display: flex;
+    /* min-width: 320px; */
+    width: 100%;
+    background-color: #000;
+    /* min-height: 100vh; */
+    /* box-sizing: border-box; */
+    /* display: flex;
   flex-direction: column; */
 }
-
-/* .app{
-    width: 1440px;
-    margin: 0 auto;
-} */

@@ -1,31 +1,32 @@
 .kanji-list {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 24px;
-  /* flex-wrap: wrap; */
-  margin: 24px 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    /* flex-wrap: wrap; */
+    margin: 24px 0;
 }
 
 .kanji-card {
-  background: #505050;
-  border: 1px solid #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.04);
-  padding: 20px 24px;
-  min-width: 600px;
-  /* max-width: 660px; */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    background: #404040;
+    border: 1px solid #555;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.04);
+    color: #fff;
+    padding: 20px 24px;
+    min-width: 600px;
+    /* max-width: 660px; */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .kanji-info {
-  width: 100%;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* .kanji-info ul{
@@ -35,96 +36,96 @@
   align-items: center;
 } */
 
-
-.kanji-info  h2 {
-  font-size: 2.5rem;
-  margin-bottom: 8px;
+.kanji-info h2 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
 }
 
 .kanji-readings {
-  font-size: 1rem;
+    font-size: 1rem;
 }
 
 .kanji-meanings {
-  font-size: 1rem;
+    font-size: 1rem;
 }
 
-.kanji-jlpt, .kanji-stroke-count {
-  font-size: 0.95rem;
+.kanji-jlpt,
+.kanji-stroke-count {
+    font-size: 0.95rem;
 }
 
 .kanji-related-words {
-  width: 100%;
-  text-align: left;
+    width: 100%;
+    text-align: left;
 }
 
 .kanji-related-words-list {
-  padding-left: 18px;
+    padding-left: 18px;
 }
 
 .kanji-related-words-list li {
-  font-size: 0.97rem;
+    font-size: 0.97rem;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  .kanji-list {
-    gap: 16px;
-    margin: 16px 0;
-  }
-  
-  .kanji-card {
-    min-width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 16px 20px;
-  }
-  
-  .kanji-info h2 {
-    font-size: 2rem;
-  }
-  
-  .kanji-readings,
-  .kanji-meanings {
-    font-size: 0.9rem;
-  }
-  
-  .kanji-jlpt,
-  .kanji-stroke-count {
-    font-size: 0.85rem;
-  }
+    .kanji-list {
+        gap: 16px;
+        margin: 16px 0;
+    }
+
+    .kanji-card {
+        min-width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 16px 20px;
+    }
+
+    .kanji-info h2 {
+        font-size: 2rem;
+    }
+
+    .kanji-readings,
+    .kanji-meanings {
+        font-size: 0.9rem;
+    }
+
+    .kanji-jlpt,
+    .kanji-stroke-count {
+        font-size: 0.85rem;
+    }
 }
 
 @media (max-width: 480px) {
-  .kanji-list {
-    gap: 12px;
-    margin: 12px 0;
-  }
-  
-  .kanji-card {
-    padding: 12px 16px;
-  }
-  
-  .kanji-info h2 {
-    font-size: 1.8rem;
-    margin-bottom: 6px;
-  }
-  
-  .kanji-readings,
-  .kanji-meanings {
-    font-size: 0.85rem;
-  }
-  
-  .kanji-jlpt,
-  .kanji-stroke-count {
-    font-size: 0.8rem;
-  }
-  
-  .kanji-related-words-list {
-    padding-left: 14px;
-  }
-  
-  .kanji-related-words-list li {
-    font-size: 0.9rem;
-  }
+    .kanji-list {
+        gap: 12px;
+        margin: 12px 0;
+    }
+
+    .kanji-card {
+        padding: 12px 16px;
+    }
+
+    .kanji-info h2 {
+        font-size: 1.8rem;
+        margin-bottom: 6px;
+    }
+
+    .kanji-readings,
+    .kanji-meanings {
+        font-size: 0.85rem;
+    }
+
+    .kanji-jlpt,
+    .kanji-stroke-count {
+        font-size: 0.8rem;
+    }
+
+    .kanji-related-words-list {
+        padding-left: 14px;
+    }
+
+    .kanji-related-words-list li {
+        font-size: 0.9rem;
+    }
 }

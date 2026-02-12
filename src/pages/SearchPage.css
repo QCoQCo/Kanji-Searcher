@@ -1,33 +1,44 @@
-.search-page{
-    width: 1440px;
+.search-page {
+    max-width: 1200px;
     margin: 0 auto;
-    /* padding: 20px; */
-    /* display: flex;
-    flex-direction: column;
-    gap: 20px; */
+    padding: 2rem;
+    flex: 1;
 }
 
-.search-page-title {
-    font-size: 24px;
-    font-weight: 600;
+/* Header styles moved to global Header component */
+
+.search-page .search-btn {
+    background: #404040;
     color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    &:hover {
+        background: #4a4a4a;
+        transform: translateY(-1px);
+    }
 }
 
 .keyboard-toggle-btn {
-    background: #404040 !important;
-    color: #fff !important;
-    border: 1px solid #555 !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    transition: all 0.2s ease !important;
+    background: #404040;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
 
 .keyboard-toggle-btn:hover {
-    background: #4a4a4a !important;
+    background: #4a4a4a;
     transform: translateY(-1px);
 }
 
@@ -36,8 +47,8 @@
 }
 
 .keyboard-toggle-btn.active {
-    background: #00ff88 !important;
-    color: #000 !important;
+    background: #00ff88;
+    color: #000;
 }
 
 /* 로딩 상태 스타일 */
@@ -68,13 +79,21 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes pulse {
-    0% { opacity: 0.7; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 /* 선택된 단어 배너 */
@@ -176,8 +195,12 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* 반응형 디자인 */
@@ -193,31 +216,31 @@
     .search-page {
         padding: 0 16px;
     }
-    
+
     .keyboard-toggle-btn {
         padding: 6px 10px !important;
         font-size: 12px !important;
     }
-    
+
     .section-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .section-header h2 {
         font-size: 20px;
     }
-    
+
     .selected-word-banner {
         padding: 12px 16px;
         font-size: 14px;
     }
-    
+
     .loading-container {
         padding: 40px 16px;
     }
-    
+
     .loading-text {
         font-size: 16px;
     }
@@ -227,38 +250,38 @@
     .search-page {
         padding: 0 12px;
     }
-    
+
     .section-header h2 {
         font-size: 18px;
     }
-    
+
     .result-count {
         padding: 4px 8px;
         font-size: 12px;
     }
-    
+
     .selected-word-banner {
         padding: 10px 12px;
         font-size: 13px;
     }
-    
+
     .loading-spinner {
         width: 40px;
         height: 40px;
     }
-    
+
     .loading-text {
         font-size: 14px;
     }
-    
+
     .no-results-icon {
         font-size: 36px;
     }
-    
+
     .no-results h3 {
         font-size: 20px;
     }
-    
+
     .no-results p {
         font-size: 14px;
     }
