@@ -99,26 +99,28 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                         }`}
                         onClick={() => isClickable && handleWordClick(item)}
                     >
-                        <h2>
-                            {item.japanese?.[0]?.word || item.japanese?.[0]?.reading || '읽기 없음'}
-                        </h2>
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        <div>
-                            읽기:{' '}
-                            {item.japanese
-                                ?.map((j: any) => j.reading)
-                                .filter(Boolean)
-                                .join(', ') || '읽기 없음'}
+                        <div className='word-card-content'>
+                            <h2>
+                                {item.japanese?.[0]?.word || item.japanese?.[0]?.reading || '읽기 없음'}
+                            </h2>
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            <div className='reading'>
+                                읽기:{' '}
+                                {item.japanese
+                                    ?.map((j: any) => j.reading)
+                                    .filter(Boolean)
+                                    .join(', ') || '읽기 없음'}
+                            </div>
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            <div className='meaning'>
+                                의미:{' '}
+                                {item.senses
+                                    ?.flatMap((sense: any) => sense.english_definitions || [])
+                                    .filter(Boolean)
+                                    .join(', ') || '의미 없음'}
+                            </div>
+                            <div className='jlpt'>JLPT: {item.jlpt?.[0] ?? '정보 없음'}</div>
                         </div>
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        <div>
-                            의미:{' '}
-                            {item.senses
-                                ?.flatMap((sense: any) => sense.english_definitions || [])
-                                .filter(Boolean)
-                                .join(', ') || '의미 없음'}
-                        </div>
-                        <div>JLPT: {item.jlpt?.[0] ?? '정보 없음'}</div>
                         {isClickable && (
                             <div className='kanji-section'>
                                 <div className='kanji-hint'>🔍 한자 분석: (클릭하여 상세보기)</div>

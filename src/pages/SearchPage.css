@@ -1,17 +1,11 @@
 .search-page {
-    width: 1440px;
+    max-width: 1200px;
     margin: 0 auto;
-    /* padding: 20px; */
-    /* display: flex;
-    flex-direction: column;
-    gap: 20px; */
+    padding: 2rem;
+    flex: 1;
 }
 
-.search-page-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #fff;
-}
+/* Header styles moved to global Header component */
 
 .search-page .search-btn {
     background: #404040;
