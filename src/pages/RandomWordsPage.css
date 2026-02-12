@@ -1,0 +1,463 @@
+.random-words-page {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex: 1;
+}
+
+.random-words-container {
+    background-color: #191919;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-height: 600px;
+}
+
+.page-header {
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.page-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.page-header .subtitle {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.level-selector {
+    padding: 2rem;
+    border-bottom: 1px solid #e5e5e5;
+    background: #fafafa;
+}
+
+.level-selector h3 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.level-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.level-button {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+    min-width: 60px;
+}
+
+.level-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.level-button.active {
+    background-color: #191919;
+    border-color: #ccc;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.level-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.total-words {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Mode selector styles */
+.mode-selector {
+    padding: 2rem;
+    border-bottom: 1px solid #e5e5e5;
+    background: #f8f9fa;
+}
+
+.mode-selector h3 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.mode-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.mode-button {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mode-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mode-button.active {
+    background-color: #191919;
+    border-color: #ccc;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.mode-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.mode-description {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* Word pool info styles */
+.word-pool-info {
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 15px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    margin: 1rem 2rem;
+}
+
+.word-pool-info .total-words {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.pool-description {
+    color: #666;
+    font-size: 0.85rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+/* Loading note styles */
+.loading-note {
+    margin: 0.5rem 0 0 0;
+    color: #888;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: #666;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 10px;
+    padding: 2rem;
+    margin: 2rem;
+    text-align: center;
+    color: #c33;
+}
+
+.error-message p {
+    margin: 0 0 1rem 0;
+}
+
+.retry-button {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+    background: #ff5252;
+    transform: translateY(-1px);
+}
+
+.word-display {
+    padding: 2rem;
+}
+
+.word-main {
+    background: #f9f9f9;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-left: 5px solid #667eea;
+}
+
+.japanese-text {
+    margin-bottom: 1.5rem;
+}
+
+.japanese-item {
+    margin-bottom: 0.5rem;
+}
+
+.japanese-word {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    display: block;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.japanese-reading {
+    font-size: 1.5rem;
+    color: #667eea;
+    font-weight: 500;
+    display: block;
+}
+
+.word-meanings {
+    margin-bottom: 1.5rem;
+}
+
+.sense-group {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.sense-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.definitions {
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.definition {
+    font-weight: 500;
+}
+
+.part-of-speech {
+    font-size: 0.9rem;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.word-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.jlpt-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.jlpt-tag {
+    background: linear-gradient(135deg, #9a9a9a, #6f6f6f, #474747, #232323, #000000);
+    background-size: 300% 300%;
+    animation: gradient-shift 3s ease-in-out infinite;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.word-actions {
+    text-align: center;
+}
+
+.next-word-button {
+    background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+}
+
+.next-word-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+}
+
+.next-word-button:active {
+    transform: translateY(0);
+}
+
+.next-word-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.no-words {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.no-words p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .random-words-page {
+        padding: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .page-header .subtitle {
+        font-size: 1rem;
+    }
+
+    .level-selector {
+        padding: 1.5rem;
+    }
+
+    .level-buttons {
+        gap: 0.5rem;
+    }
+
+    .level-button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        min-width: 50px;
+    }
+
+    .word-display {
+        padding: 1.5rem;
+    }
+
+    .word-main {
+        padding: 1.5rem;
+    }
+
+    .japanese-word {
+        font-size: 2rem;
+    }
+
+    .japanese-reading {
+        font-size: 1.3rem;
+    }
+
+    .definitions {
+        font-size: 1.1rem;
+    }
+
+    .next-word-button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .level-buttons {
+        justify-content: center;
+    }
+
+    .level-button {
+        flex: 1;
+        min-width: auto;
+    }
+
+    .japanese-word {
+        font-size: 1.8rem;
+    }
+
+    .japanese-reading {
+        font-size: 1.2rem;
+    }
+}

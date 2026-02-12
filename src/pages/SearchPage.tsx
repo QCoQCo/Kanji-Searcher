@@ -102,7 +102,6 @@ const SearchPage: React.FC = () => {
 
     return (
         <div className='search-page'>
-            <h1 className='search-page-title'>Kanji Searcher</h1>
             <div style={{ display: 'flex', gap: 16 }}>
                 <input
                     type='text'
