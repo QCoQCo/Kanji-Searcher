@@ -25,6 +25,14 @@ const Header: React.FC = () => {
                         >
                             Random Words
                         </Link>
+                        <Link
+                            to='/word-bank'
+                            className={`nav-link ${
+                                location.pathname === '/word-bank' ? 'active' : ''
+                            }`}
+                        >
+                            Word Bank
+                        </Link>
                     </nav>
                 </div>
             </div>

@@ -1,9 +1,10 @@
 import React from 'react';
 import { useRandomWords } from '../hooks/useRandomWords';
+import { useWordBank } from '../hooks/useWordBank';
 import type { JLPTLevel } from '../types/kanji';
 import './RandomWordsPage.css';
 
-const JLPT_LEVELS: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
+const JLPT_LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5'];
 
 const RandomWordsPage: React.FC = () => {
     const {
@@ -16,6 +17,8 @@ const RandomWordsPage: React.FC = () => {
         reload,
         totalWords,
     } = useRandomWords();
+
+    const { isSaved, toggleWord } = useWordBank();
 
     const formatPartOfSpeech = (partsOfSpeech?: string[]) => {
         if (!partsOfSpeech || partsOfSpeech.length === 0) return '';
@@ -129,6 +132,14 @@ const RandomWordsPage: React.FC = () => {
                         </div>
 
                         <div className='word-actions'>
+                            <button
+                                onClick={() => toggleWord(currentWord)}
+                                className={`save-word-button ${
+                                    isSaved(currentWord) ? 'saved' : ''
+                                }`}
+                            >
+                                {isSaved(currentWord) ? '★ Saved' : '☆ Save Word'}
+                            </button>
                             <button
                                 onClick={getRandomWord}
                                 className='next-word-button'
