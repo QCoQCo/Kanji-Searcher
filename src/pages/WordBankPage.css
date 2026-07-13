@@ -1,0 +1,176 @@
+.word-bank-page {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex: 1;
+}
+
+.word-bank-container {
+    background-color: #191919;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-height: 600px;
+}
+
+.word-bank-container .page-header {
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.word-bank-container .page-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.word-bank-container .page-header .subtitle {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.word-bank-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding: 1.5rem 2rem;
+    /* background: #fafafa; */
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.export-button,
+.clear-button {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+}
+
+.export-button:hover,
+.clear-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.clear-button:hover {
+    border-color: #e57373;
+    color: #c62828;
+}
+
+.word-bank-list {
+    list-style: none;
+    margin: 0;
+    padding: 1.5rem 2rem 2rem;
+    /* background: white; */
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.word-bank-item {
+    position: relative;
+    padding: 1rem 3rem 1rem 1.25rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background: #333;
+    transition: box-shadow 0.2s ease;
+}
+
+.word-bank-item:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.25);
+}
+
+.word-bank-japanese {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.word-bank-word {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fafafa;
+}
+
+.word-bank-reading {
+    font-size: 1.05rem;
+    color: #fafafa;
+}
+
+.word-bank-meanings {
+    color: #fafafa;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.word-bank-jlpt {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.word-bank-jlpt .jlpt-tag {
+    background: #191919;
+    color: white;
+    padding: 0.15rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.remove-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #999;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.word-bank-empty {
+    background: white;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: #666;
+    min-height: 400px;
+}
+
+.word-bank-empty p {
+    margin: 0.5rem 0;
+}
+
+.word-bank-empty a {
+    color: #191919;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .word-bank-page {
+        padding: 1rem;
+    }
+
+    .word-bank-list {
+        padding: 1rem;
+    }
+}

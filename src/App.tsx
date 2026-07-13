@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import SearchPage from './pages/SearchPage';
 import RandomWordsPage from './pages/RandomWordsPage';
+import WordBankPage from './pages/WordBankPage';
 
 import './utils/animations.css';
 import './App.css';
@@ -27,6 +28,7 @@ function App() {
                     <Route path='/' element={<Layout />}>
                         <Route index element={<SearchPage />} />
                         <Route path='random-words' element={<RandomWordsPage />} />
+                        <Route path='word-bank' element={<WordBankPage />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
