@@ -1,95 +1,123 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRandomWords } from '../hooks/useRandomWords';
+import { useWordBank, getWordKey } from '../hooks/useWordBank';
+import WordCard from '../components/WordCard';
+import type { CardDisplayMode, CardFront } from '../components/WordCard';
 import type { JLPTLevel } from '../types/kanji';
 import './RandomWordsPage.css';
 
-const JLPT_LEVELS: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
+const JLPT_LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5'];
+const COUNT_OPTIONS = [1, 3, 5, 10];
 
 const RandomWordsPage: React.FC = () => {
     const {
-        selectedLevel,
-        wordPoolMode,
-        currentWord,
+        selectedLevels,
+        displayCount,
+        setDisplayCount,
+        currentWords,
         isLoading,
         error,
-        loadingProgress,
-        changeLevel,
-        changeMode,
-        getRandomWord,
+        toggleLevel,
+        drawNextWords,
         reload,
         totalWords,
-    } = useRandomWords({ mode: 'comprehensive' }); // 기본적으로 포괄적 모드 사용
+    } = useRandomWords();
 
-    const formatPartOfSpeech = (partsOfSpeech?: string[]) => {
-        if (!partsOfSpeech || partsOfSpeech.length === 0) return '';
-        return partsOfSpeech.map((pos) => pos.replace(/-/g, ' ')).join(', ');
-    };
+    const { isSaved, toggleWord } = useWordBank();
+
+    const [displayMode, setDisplayMode] = useState<CardDisplayMode>('full');
+    const [cardFront, setCardFront] = useState<CardFront>('word');
 
     return (
         <div className='random-words-page'>
             <div className='random-words-container'>
                 <header className='page-header'>
                     <h1>Japanese Random Words</h1>
-                    <p className='subtitle'>Practice with random vocabulary from various sources</p>
+                    <p className='subtitle'>Practice with random JLPT vocabulary</p>
                 </header>
 
-                <div className='mode-selector'>
-                    <h3>Word Pool Mode:</h3>
-                    <div className='mode-buttons'>
-                        <button
-                            onClick={() => changeMode('comprehensive')}
-                            className={`mode-button ${
-                                wordPoolMode === 'comprehensive' ? 'active' : ''
-                            }`}
-                            disabled={isLoading}
-                        >
-                            🌐 Comprehensive (All Words)
-                        </button>
-                        <button
-                            onClick={() => changeMode('jlpt')}
-                            className={`mode-button ${wordPoolMode === 'jlpt' ? 'active' : ''}`}
-                            disabled={isLoading}
-                        >
-                            📚 JLPT Only
-                        </button>
+                <div className='level-selector'>
+                    <h3>Select JLPT Levels:</h3>
+                    <div className='level-buttons'>
+                        {JLPT_LEVELS.map((level) => (
+                            <button
+                                key={level}
+                                onClick={() => toggleLevel(level)}
+                                className={`level-button ${
+                                    selectedLevels.includes(level) ? 'active' : ''
+                                }`}
+                                disabled={isLoading}
+                            >
+                                {level}
+                            </button>
+                        ))}
                     </div>
-                    <p className='mode-description'>
-                        {wordPoolMode === 'comprehensive'
-                            ? 'Access thousands of words from various categories and sources'
-                            : 'Focus on JLPT-tagged vocabulary for test preparation'}
+                    <p className='level-description'>
+                        Combine multiple levels to build your word pool
                     </p>
                 </div>
 
-                {wordPoolMode === 'jlpt' && (
-                    <div className='level-selector'>
-                        <h3>Select JLPT Level:</h3>
-                        <div className='level-buttons'>
-                            {JLPT_LEVELS.map((level) => (
-                                <button
-                                    key={level}
-                                    onClick={() => changeLevel(level)}
-                                    className={`level-button ${
-                                        selectedLevel === level ? 'active' : ''
-                                    }`}
-                                    disabled={isLoading}
-                                >
-                                    {level}
-                                </button>
-                            ))}
-                        </div>
+                <div className='display-controls'>
+                    <div className='control-group'>
+                        <span className='control-label'>Display:</span>
+                        <button
+                            onClick={() => setDisplayMode('full')}
+                            className={`control-button ${displayMode === 'full' ? 'active' : ''}`}
+                        >
+                            Full
+                        </button>
+                        <button
+                            onClick={() => setDisplayMode('flashcard')}
+                            className={`control-button ${
+                                displayMode === 'flashcard' ? 'active' : ''
+                            }`}
+                        >
+                            Flashcard
+                        </button>
                     </div>
-                )}
+
+                    {displayMode === 'flashcard' && (
+                        <div className='control-group'>
+                            <span className='control-label'>Front:</span>
+                            <button
+                                onClick={() => setCardFront('word')}
+                                className={`control-button ${cardFront === 'word' ? 'active' : ''}`}
+                            >
+                                Word
+                            </button>
+                            <button
+                                onClick={() => setCardFront('meaning')}
+                                className={`control-button ${
+                                    cardFront === 'meaning' ? 'active' : ''
+                                }`}
+                            >
+                                Meaning
+                            </button>
+                        </div>
+                    )}
+
+                    <div className='control-group'>
+                        <span className='control-label'>Count:</span>
+                        {COUNT_OPTIONS.map((count) => (
+                            <button
+                                key={count}
+                                onClick={() => setDisplayCount(count)}
+                                className={`control-button ${
+                                    displayCount === count ? 'active' : ''
+                                }`}
+                                disabled={isLoading}
+                            >
+                                {count}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {totalWords > 0 && (
                     <div className='word-pool-info'>
                         <p className='total-words'>
                             📖 Total words available: <strong>{totalWords.toLocaleString()}</strong>
                         </p>
-                        {wordPoolMode === 'comprehensive' && (
-                            <p className='pool-description'>
-                                Sourced from JLPT levels, common vocabulary, categories, and more
-                            </p>
-                        )}
                     </div>
                 )}
 
@@ -105,88 +133,37 @@ const RandomWordsPage: React.FC = () => {
                 {isLoading ? (
                     <div className='loading-container'>
                         <div className='loading-spinner'></div>
-                        <p>{loadingProgress || 'Loading vocabulary...'}</p>
-                        {wordPoolMode === 'comprehensive' && (
-                            <p className='loading-note'>
-                                This may take a moment as we gather words from multiple sources
-                            </p>
-                        )}
+                        <p>Loading vocabulary...</p>
                     </div>
-                ) : currentWord ? (
-                    <div className='word-display'>
-                        <div className='word-main'>
-                            <div className='japanese-text'>
-                                {currentWord.japanese.map((jp, index) => (
-                                    <div key={index} className='japanese-item'>
-                                        {jp.word && (
-                                            <span className='japanese-word'>{jp.word}</span>
-                                        )}
-                                        <span className='japanese-reading'>{jp.reading}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className='word-meanings'>
-                                {currentWord.senses.map((sense, index) => (
-                                    <div key={index} className='sense-group'>
-                                        <div className='definitions'>
-                                            {sense.english_definitions.map((def, defIndex) => (
-                                                <span key={defIndex} className='definition'>
-                                                    {defIndex > 0 && ', '}
-                                                    {def}
-                                                </span>
-                                            ))}
-                                        </div>
-                                        {sense.parts_of_speech &&
-                                            sense.parts_of_speech.length > 0 && (
-                                                <div className='part-of-speech'>
-                                                    ({formatPartOfSpeech(sense.parts_of_speech)})
-                                                </div>
-                                            )}
-                                        {sense.tags && sense.tags.length > 0 && (
-                                            <div className='word-tags'>
-                                                {sense.tags.map((tag, tagIndex) => (
-                                                    <span key={tagIndex} className='tag'>
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            {currentWord.jlpt && currentWord.jlpt.length > 0 && (
-                                <div className='jlpt-tags'>
-                                    {currentWord.jlpt.map((level, index) => (
-                                        <span key={index} className='jlpt-tag'>
-                                            {level.toUpperCase()}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
+                ) : currentWords.length > 0 ? (
+                    <>
+                        <div className={`words-grid ${currentWords.length > 1 ? 'multi' : ''}`}>
+                            {currentWords.map((word) => (
+                                <WordCard
+                                    key={`${getWordKey(word)}-${displayMode}-${cardFront}`}
+                                    word={word}
+                                    mode={displayMode}
+                                    front={cardFront}
+                                    isSaved={isSaved(word)}
+                                    onToggleSave={() => toggleWord(word)}
+                                />
+                            ))}
                         </div>
 
                         <div className='word-actions'>
                             <button
-                                onClick={getRandomWord}
+                                onClick={drawNextWords}
                                 className='next-word-button'
                                 disabled={isLoading}
                             >
-                                🎲 Get New Word
+                                {displayCount === 1 ? '🎲 Get New Word' : '🎲 Get New Words'}
                             </button>
                         </div>
-                    </div>
+                    </>
                 ) : (
                     !error && (
                         <div className='no-words'>
-                            <p>
-                                No words found for{' '}
-                                {wordPoolMode === 'jlpt'
-                                    ? `${selectedLevel} level`
-                                    : 'comprehensive search'}
-                                .
-                            </p>
+                            <p>No words found for {selectedLevels.join(', ')}.</p>
                             <button onClick={reload} className='retry-button'>
                                 Try Again
                             </button>

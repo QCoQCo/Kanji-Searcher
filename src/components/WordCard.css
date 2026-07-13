@@ -1,0 +1,81 @@
+.word-card {
+    position: relative;
+    background: #333;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 1.8rem;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.word-card.flashcard {
+    cursor: pointer;
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.word-card.flashcard:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.card-save-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #bbb;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-save-button:hover {
+    background: #f5f5f5;
+    color: #f9a825;
+}
+
+.card-save-button.saved {
+    color: #f9a825;
+}
+
+.flashcard-hint {
+    margin-top: 1.25rem;
+    color: #aaa;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* 여러 장 그리드에서는 카드 내부 요소를 컴팩트하게 */
+.words-grid.multi .word-card {
+    padding: 2rem 1.25rem 1.25rem;
+}
+
+.words-grid.multi .japanese-word {
+    font-size: 2rem;
+}
+
+.words-grid.multi .japanese-reading {
+    font-size: 1.1rem;
+}
+
+.words-grid.multi .definitions {
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
