@@ -1,74 +1,42 @@
 import { useState, useEffect } from 'react';
-import { searchJLPTWords, searchComprehensiveWordPool } from '../apis/jishoApi';
+import { fetchWordsForLevels } from '../apis/jlptData';
 import type { WordData, JLPTLevel } from '../types/kanji';
 
-export type WordPoolMode = 'jlpt' | 'comprehensive';
-
 export interface UseRandomWordsOptions {
-    mode?: WordPoolMode;
-    jlptLevel?: JLPTLevel;
+    initialLevels?: JLPTLevel[];
 }
 
 export const useRandomWords = (options: UseRandomWordsOptions = {}) => {
-    const { mode = 'comprehensive', jlptLevel = 'N5' } = options;
+    const { initialLevels = ['N5'] } = options;
 
-    const [selectedLevel, setSelectedLevel] = useState<JLPTLevel>(jlptLevel);
-    const [wordPoolMode, setWordPoolMode] = useState<WordPoolMode>(mode);
+    const [selectedLevels, setSelectedLevels] = useState<JLPTLevel[]>(initialLevels);
     const [allWords, setAllWords] = useState<WordData[]>([]);
     const [currentWord, setCurrentWord] = useState<WordData | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [loadingProgress, setLoadingProgress] = useState<string>('');
 
-    // 단어 풀을 가져오는 함수 (모드에 따라 다른 방식 사용)
-    const fetchWordPool = async (mode: WordPoolMode, level?: JLPTLevel) => {
+    // 선택된 레벨들의 단어 풀을 가져오는 함수
+    const fetchWordPool = async (levels: JLPTLevel[]) => {
         setIsLoading(true);
         setError(null);
-        setLoadingProgress('');
 
         try {
-            let response;
-            let words: WordData[] = [];
-
-            if (mode === 'jlpt' && level) {
-                setLoadingProgress(`Loading ${level} vocabulary...`);
-                response = await searchJLPTWords(level);
-                if (response.data && Array.isArray(response.data)) {
-                    words = response.data;
-                }
-            } else if (mode === 'comprehensive') {
-                setLoadingProgress('Loading comprehensive vocabulary database...');
-                response = await searchComprehensiveWordPool();
-                if (response.data && Array.isArray(response.data)) {
-                    words = response.data;
-
-                    // JLPT 레벨별 필터링 (선택사항)
-                    if (level) {
-                        words = words.filter(
-                            (word) => word.jlpt && word.jlpt.includes(level.toLowerCase())
-                        );
-                    }
-                }
-            }
+            const words = await fetchWordsForLevels(levels);
 
             if (words.length > 0) {
                 setAllWords(words);
                 // 첫 번째 랜덤 단어 설정
                 const randomIndex = Math.floor(Math.random() * words.length);
                 setCurrentWord(words[randomIndex]);
-                setLoadingProgress(`Loaded ${words.length} words successfully!`);
             } else {
                 setAllWords([]);
                 setCurrentWord(null);
-                setLoadingProgress('No words found');
             }
         } catch (err) {
-            console.error(`Error fetching word pool (${mode}):`, err);
-            const modeText = mode === 'jlpt' ? `JLPT ${level}` : 'comprehensive';
-            setError(`Failed to fetch ${modeText} word pool. Please try again.`);
+            console.error('Error fetching word pool:', err);
+            setError(`Failed to load vocabulary for ${levels.join(', ')}. Please try again.`);
             setAllWords([]);
             setCurrentWord(null);
-            setLoadingProgress('');
         } finally {
             setIsLoading(false);
         }
@@ -82,36 +50,37 @@ export const useRandomWords = (options: UseRandomWordsOptions = {}) => {
         }
     };
 
-    // JLPT 레벨 변경
-    const changeLevel = (level: JLPTLevel) => {
-        setSelectedLevel(level);
+    // JLPT 레벨 토글 (최소 1개는 항상 선택 유지)
+    const toggleLevel = (level: JLPTLevel) => {
+        setSelectedLevels((prev) => {
+            if (prev.includes(level)) {
+                if (prev.length === 1) {
+                    return prev; // 마지막 하나는 해제 불가
+                }
+                return prev.filter((l) => l !== level);
+            }
+            return [...prev, level];
+        });
     };
 
-    // 단어 풀 모드 변경
-    const changeMode = (newMode: WordPoolMode) => {
-        setWordPoolMode(newMode);
-    };
-
-    // 모드나 레벨이 변경되면 단어 풀을 다시 가져옴
+    // 선택된 레벨이 변경되면 단어 풀을 다시 가져옴
     useEffect(() => {
-        fetchWordPool(wordPoolMode, wordPoolMode === 'jlpt' ? selectedLevel : undefined);
-    }, [wordPoolMode, selectedLevel]);
+        fetchWordPool(selectedLevels);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedLevels]);
 
     // 다시 로드
     const reload = () => {
-        fetchWordPool(wordPoolMode, wordPoolMode === 'jlpt' ? selectedLevel : undefined);
+        fetchWordPool(selectedLevels);
     };
 
     return {
-        selectedLevel,
-        wordPoolMode,
+        selectedLevels,
         currentWord,
         allWords,
         isLoading,
         error,
-        loadingProgress,
-        changeLevel,
-        changeMode,
+        toggleLevel,
         getRandomWord,
         reload,
         totalWords: allWords.length,

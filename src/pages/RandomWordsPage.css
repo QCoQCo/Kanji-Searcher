@@ -91,69 +91,6 @@
     font-size: 0.9rem;
 }
 
-/* Mode selector styles */
-.mode-selector {
-    padding: 2rem;
-    border-bottom: 1px solid #e5e5e5;
-    background: #f8f9fa;
-}
-
-.mode-selector h3 {
-    margin: 0 0 1rem 0;
-    color: #333;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-.mode-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    justify-content: center;
-}
-
-.mode-button {
-    padding: 0.75rem 1.5rem;
-    border: 2px solid #ddd;
-    background: white;
-    border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #666;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.mode-button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.mode-button.active {
-    background-color: #191919;
-    border-color: #ccc;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-.mode-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.mode-description {
-    margin: 0.5rem 0 0 0;
-    color: #666;
-    font-size: 0.85rem;
-    font-style: italic;
-}
-
 /* Word pool info styles */
 .word-pool-info {
     text-align: center;
@@ -168,21 +105,6 @@
     font-size: 1rem;
     margin: 0 0 0.5rem 0;
     color: #333;
-}
-
-.pool-description {
-    color: #666;
-    font-size: 0.85rem;
-    margin: 0;
-    opacity: 0.8;
-}
-
-/* Loading note styles */
-.loading-note {
-    margin: 0.5rem 0 0 0;
-    color: #888;
-    font-size: 0.85rem;
-    font-style: italic;
 }
 
 .loading-container {
@@ -460,4 +382,11 @@
     .japanese-reading {
         font-size: 1.2rem;
     }
+}
+
+.level-description {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+    font-size: 0.85rem;
+    font-style: italic;
 }

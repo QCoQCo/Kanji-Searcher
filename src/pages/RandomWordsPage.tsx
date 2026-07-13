@@ -7,18 +7,15 @@ const JLPT_LEVELS: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 
 const RandomWordsPage: React.FC = () => {
     const {
-        selectedLevel,
-        wordPoolMode,
+        selectedLevels,
         currentWord,
         isLoading,
         error,
-        loadingProgress,
-        changeLevel,
-        changeMode,
+        toggleLevel,
         getRandomWord,
         reload,
         totalWords,
-    } = useRandomWords({ mode: 'comprehensive' }); // 기본적으로 포괄적 모드 사용
+    } = useRandomWords();
 
     const formatPartOfSpeech = (partsOfSpeech?: string[]) => {
         if (!partsOfSpeech || partsOfSpeech.length === 0) return '';
@@ -30,66 +27,35 @@ const RandomWordsPage: React.FC = () => {
             <div className='random-words-container'>
                 <header className='page-header'>
                     <h1>Japanese Random Words</h1>
-                    <p className='subtitle'>Practice with random vocabulary from various sources</p>
+                    <p className='subtitle'>Practice with random JLPT vocabulary</p>
                 </header>
 
-                <div className='mode-selector'>
-                    <h3>Word Pool Mode:</h3>
-                    <div className='mode-buttons'>
-                        <button
-                            onClick={() => changeMode('comprehensive')}
-                            className={`mode-button ${
-                                wordPoolMode === 'comprehensive' ? 'active' : ''
-                            }`}
-                            disabled={isLoading}
-                        >
-                            🌐 Comprehensive (All Words)
-                        </button>
-                        <button
-                            onClick={() => changeMode('jlpt')}
-                            className={`mode-button ${wordPoolMode === 'jlpt' ? 'active' : ''}`}
-                            disabled={isLoading}
-                        >
-                            📚 JLPT Only
-                        </button>
+                <div className='level-selector'>
+                    <h3>Select JLPT Levels:</h3>
+                    <div className='level-buttons'>
+                        {JLPT_LEVELS.map((level) => (
+                            <button
+                                key={level}
+                                onClick={() => toggleLevel(level)}
+                                className={`level-button ${
+                                    selectedLevels.includes(level) ? 'active' : ''
+                                }`}
+                                disabled={isLoading}
+                            >
+                                {level}
+                            </button>
+                        ))}
                     </div>
-                    <p className='mode-description'>
-                        {wordPoolMode === 'comprehensive'
-                            ? 'Access thousands of words from various categories and sources'
-                            : 'Focus on JLPT-tagged vocabulary for test preparation'}
+                    <p className='level-description'>
+                        Combine multiple levels to build your word pool
                     </p>
                 </div>
-
-                {wordPoolMode === 'jlpt' && (
-                    <div className='level-selector'>
-                        <h3>Select JLPT Level:</h3>
-                        <div className='level-buttons'>
-                            {JLPT_LEVELS.map((level) => (
-                                <button
-                                    key={level}
-                                    onClick={() => changeLevel(level)}
-                                    className={`level-button ${
-                                        selectedLevel === level ? 'active' : ''
-                                    }`}
-                                    disabled={isLoading}
-                                >
-                                    {level}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
 
                 {totalWords > 0 && (
                     <div className='word-pool-info'>
                         <p className='total-words'>
                             📖 Total words available: <strong>{totalWords.toLocaleString()}</strong>
                         </p>
-                        {wordPoolMode === 'comprehensive' && (
-                            <p className='pool-description'>
-                                Sourced from JLPT levels, common vocabulary, categories, and more
-                            </p>
-                        )}
                     </div>
                 )}
 
@@ -105,12 +71,7 @@ const RandomWordsPage: React.FC = () => {
                 {isLoading ? (
                     <div className='loading-container'>
                         <div className='loading-spinner'></div>
-                        <p>{loadingProgress || 'Loading vocabulary...'}</p>
-                        {wordPoolMode === 'comprehensive' && (
-                            <p className='loading-note'>
-                                This may take a moment as we gather words from multiple sources
-                            </p>
-                        )}
+                        <p>Loading vocabulary...</p>
                     </div>
                 ) : currentWord ? (
                     <div className='word-display'>
@@ -180,13 +141,7 @@ const RandomWordsPage: React.FC = () => {
                 ) : (
                     !error && (
                         <div className='no-words'>
-                            <p>
-                                No words found for{' '}
-                                {wordPoolMode === 'jlpt'
-                                    ? `${selectedLevel} level`
-                                    : 'comprehensive search'}
-                                .
-                            </p>
+                            <p>No words found for {selectedLevels.join(', ')}.</p>
                             <button onClick={reload} className='retry-button'>
                                 Try Again
                             </button>
