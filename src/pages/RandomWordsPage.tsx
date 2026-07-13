@@ -1,29 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRandomWords } from '../hooks/useRandomWords';
-import { useWordBank } from '../hooks/useWordBank';
+import { useWordBank, getWordKey } from '../hooks/useWordBank';
+import WordCard from '../components/WordCard';
+import type { CardDisplayMode, CardFront } from '../components/WordCard';
 import type { JLPTLevel } from '../types/kanji';
 import './RandomWordsPage.css';
 
 const JLPT_LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5'];
+const COUNT_OPTIONS = [1, 3, 5, 10];
 
 const RandomWordsPage: React.FC = () => {
     const {
         selectedLevels,
-        currentWord,
+        displayCount,
+        setDisplayCount,
+        currentWords,
         isLoading,
         error,
         toggleLevel,
-        getRandomWord,
+        drawNextWords,
         reload,
         totalWords,
     } = useRandomWords();
 
     const { isSaved, toggleWord } = useWordBank();
 
-    const formatPartOfSpeech = (partsOfSpeech?: string[]) => {
-        if (!partsOfSpeech || partsOfSpeech.length === 0) return '';
-        return partsOfSpeech.map((pos) => pos.replace(/-/g, ' ')).join(', ');
-    };
+    const [displayMode, setDisplayMode] = useState<CardDisplayMode>('full');
+    const [cardFront, setCardFront] = useState<CardFront>('word');
 
     return (
         <div className='random-words-page'>
@@ -54,6 +57,62 @@ const RandomWordsPage: React.FC = () => {
                     </p>
                 </div>
 
+                <div className='display-controls'>
+                    <div className='control-group'>
+                        <span className='control-label'>Display:</span>
+                        <button
+                            onClick={() => setDisplayMode('full')}
+                            className={`control-button ${displayMode === 'full' ? 'active' : ''}`}
+                        >
+                            Full
+                        </button>
+                        <button
+                            onClick={() => setDisplayMode('flashcard')}
+                            className={`control-button ${
+                                displayMode === 'flashcard' ? 'active' : ''
+                            }`}
+                        >
+                            Flashcard
+                        </button>
+                    </div>
+
+                    {displayMode === 'flashcard' && (
+                        <div className='control-group'>
+                            <span className='control-label'>Front:</span>
+                            <button
+                                onClick={() => setCardFront('word')}
+                                className={`control-button ${cardFront === 'word' ? 'active' : ''}`}
+                            >
+                                Word
+                            </button>
+                            <button
+                                onClick={() => setCardFront('meaning')}
+                                className={`control-button ${
+                                    cardFront === 'meaning' ? 'active' : ''
+                                }`}
+                            >
+                                Meaning
+                            </button>
+                        </div>
+                    )}
+
+                    <div className='control-group'>
+                        <span className='control-label'>Count:</span>
+                        {COUNT_OPTIONS.map((count) => (
+                            <button
+                                key={count}
+                                onClick={() => setDisplayCount(count)}
+                                className={`control-button ${
+                                    displayCount === count ? 'active' : ''
+                                }`}
+                                disabled={isLoading}
+                            >
+                                {count}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 {totalWords > 0 && (
                     <div className='word-pool-info'>
                         <p className='total-words'>
@@ -76,79 +135,31 @@ const RandomWordsPage: React.FC = () => {
                         <div className='loading-spinner'></div>
                         <p>Loading vocabulary...</p>
                     </div>
-                ) : currentWord ? (
-                    <div className='word-display'>
-                        <div className='word-main'>
-                            <div className='japanese-text'>
-                                {currentWord.japanese.map((jp, index) => (
-                                    <div key={index} className='japanese-item'>
-                                        {jp.word && (
-                                            <span className='japanese-word'>{jp.word}</span>
-                                        )}
-                                        <span className='japanese-reading'>{jp.reading}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className='word-meanings'>
-                                {currentWord.senses.map((sense, index) => (
-                                    <div key={index} className='sense-group'>
-                                        <div className='definitions'>
-                                            {sense.english_definitions.map((def, defIndex) => (
-                                                <span key={defIndex} className='definition'>
-                                                    {defIndex > 0 && ', '}
-                                                    {def}
-                                                </span>
-                                            ))}
-                                        </div>
-                                        {sense.parts_of_speech &&
-                                            sense.parts_of_speech.length > 0 && (
-                                                <div className='part-of-speech'>
-                                                    ({formatPartOfSpeech(sense.parts_of_speech)})
-                                                </div>
-                                            )}
-                                        {sense.tags && sense.tags.length > 0 && (
-                                            <div className='word-tags'>
-                                                {sense.tags.map((tag, tagIndex) => (
-                                                    <span key={tagIndex} className='tag'>
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            {currentWord.jlpt && currentWord.jlpt.length > 0 && (
-                                <div className='jlpt-tags'>
-                                    {currentWord.jlpt.map((level, index) => (
-                                        <span key={index} className='jlpt-tag'>
-                                            {level.toUpperCase()}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
+                ) : currentWords.length > 0 ? (
+                    <>
+                        <div className={`words-grid ${currentWords.length > 1 ? 'multi' : ''}`}>
+                            {currentWords.map((word) => (
+                                <WordCard
+                                    key={`${getWordKey(word)}-${displayMode}-${cardFront}`}
+                                    word={word}
+                                    mode={displayMode}
+                                    front={cardFront}
+                                    isSaved={isSaved(word)}
+                                    onToggleSave={() => toggleWord(word)}
+                                />
+                            ))}
                         </div>
 
                         <div className='word-actions'>
                             <button
-                                onClick={() => toggleWord(currentWord)}
-                                className={`save-word-button ${
-                                    isSaved(currentWord) ? 'saved' : ''
-                                }`}
-                            >
-                                {isSaved(currentWord) ? '★ Saved' : '☆ Save Word'}
-                            </button>
-                            <button
-                                onClick={getRandomWord}
+                                onClick={drawNextWords}
                                 className='next-word-button'
                                 disabled={isLoading}
                             >
-                                🎲 Get New Word
+                                {displayCount === 1 ? '🎲 Get New Word' : '🎲 Get New Words'}
                             </button>
                         </div>
-                    </div>
+                    </>
                 ) : (
                     !error && (
                         <div className='no-words'>
