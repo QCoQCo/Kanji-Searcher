@@ -149,10 +149,10 @@
 }
 
 .word-bank-empty {
-    background: white;
+    background: #191919;
     padding: 4rem 2rem;
     text-align: center;
-    color: #666;
+    color: #fafafa;
     min-height: 400px;
 }
 
@@ -161,7 +161,7 @@
 }
 
 .word-bank-empty a {
-    color: #191919;
+    color: #fafafa;
     font-weight: 600;
 }
 
