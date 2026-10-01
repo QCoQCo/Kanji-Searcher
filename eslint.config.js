@@ -5,12 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 
-export default tseslint.config(globalIgnores(['dist']), {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+export default tseslint.config(globalIgnores(['dist', '.netlify']), {
     files: ['**/*.{ts,tsx}'],
     extends: [
         js.configs.recommended,
-        ...tseslint.configs.recommendedTypeChecked,
+        ...tseslint.configs.recommended,
         reactHooks.configs['recommended-latest'],
         reactRefresh.configs.vite,
     ],
@@ -18,12 +17,7 @@ export default tseslint.config(globalIgnores(['dist']), {
         ecmaVersion: 2020,
         globals: globals.browser,
     },
-    plugins: {
-        'react-hooks': reactHooks,
-        'react-refresh': reactRefresh,
-    },
     rules: {
-        ...reactHooks.configs.recommended.rules,
         'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
 });

@@ -1,6 +1,8 @@
 import React from 'react';
 import './WordList.css';
 import { extractKanjiFromWordObject, hasKanji, getUniqueKanji } from '../utils/kanjiExtractor';
+import { formatJLPT } from '../utils/jlpt';
+import type { JapaneseReading, Sense } from '../types/kanji';
 
 interface WordListProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,23 +105,21 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                             <h2>
                                 {item.japanese?.[0]?.word || item.japanese?.[0]?.reading || '읽기 없음'}
                             </h2>
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             <div className='reading'>
                                 읽기:{' '}
                                 {item.japanese
-                                    ?.map((j: any) => j.reading)
+                                    ?.map((j: JapaneseReading) => j.reading)
                                     .filter(Boolean)
                                     .join(', ') || '읽기 없음'}
                             </div>
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             <div className='meaning'>
                                 의미:{' '}
                                 {item.senses
-                                    ?.flatMap((sense: any) => sense.english_definitions || [])
+                                    ?.flatMap((sense: Sense) => sense.english_definitions || [])
                                     .filter(Boolean)
                                     .join(', ') || '의미 없음'}
                             </div>
-                            <div className='jlpt'>JLPT: {item.jlpt?.[0] ?? '정보 없음'}</div>
+                            <div className='jlpt'>JLPT: {item.jlpt?.[0] ? formatJLPT(item.jlpt[0]) : '정보 없음'}</div>
                         </div>
                         {isClickable && (
                             <div className='kanji-section'>

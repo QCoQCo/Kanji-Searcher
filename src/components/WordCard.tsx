@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { WordData } from '../types/kanji';
+import { formatJLPT } from '../utils/jlpt';
 import './WordCard.css';
 
 export type CardDisplayMode = 'full' | 'flashcard';
@@ -105,7 +106,7 @@ const WordCard: React.FC<WordCardProps> = ({ word, mode, front, isSaved, onToggl
                 <div className='jlpt-tags'>
                     {word.jlpt.map((level, index) => (
                         <span key={index} className='jlpt-tag'>
-                            {level.toUpperCase()}
+                            {formatJLPT(level)}
                         </span>
                     ))}
                 </div>

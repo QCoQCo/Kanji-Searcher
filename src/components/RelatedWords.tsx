@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './RelatedWords.css';
 import { searchKanji } from '../apis/jishoApi';
-import { extractKanjiFromWordObject, hasKanji } from '../utils/kanjiExtractor';
+import { extractKanjiFromWordObject } from '../utils/kanjiExtractor';
+import { formatJLPT, matchesJLPTLevels } from '../utils/jlpt';
+import { getWordKey } from '../hooks/useWordBank';
 import type { WordData } from '../types/kanji';
 
 interface RelatedWordsProps {
@@ -19,63 +21,56 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<'kanji' | 'jlpt'>('kanji');
 
+    // 부모가 렌더마다 새 배열을 넘겨도 내용이 같으면 재요청하지 않도록 원시값 키로 비교
+    const kanjiKey = currentKanji.join('');
+    const levelsKey = currentJLPTLevels.join(',');
+
     useEffect(() => {
-        if (currentKanji.length > 0) {
-            fetchRelatedWords();
-        }
-    }, [currentKanji]);
+        if (!kanjiKey) return;
 
-    const fetchRelatedWords = async () => {
-        if (currentKanji.length === 0) return;
+        let cancelled = false;
+        const kanjiList = Array.from(kanjiKey).slice(0, 3); // 최대 3개 한자만 검색
+        const levels = levelsKey ? levelsKey.split(',') : [];
 
-        setLoading(true);
-        try {
-            const relatedWords = new Set();
+        const fetchRelatedWords = async () => {
+            setLoading(true);
 
-            // 각 한자로 검색하여 관련 단어 수집
-            for (const kanji of currentKanji.slice(0, 3)) {
-                // 최대 3개 한자만 검색
-                try {
-                    const data = await searchKanji(kanji);
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    data.data.forEach((word: any) => {
-                        // 현재 검색에서 나온 단어들과 중복 제거
-                        const kanjiInWord = extractKanjiFromWordObject(word);
-                        if (hasKanji(kanjiInWord) && relatedWords.size < 12) {
-                            relatedWords.add(JSON.stringify(word));
-                        }
-                    });
-                } catch (error) {
-                    console.error(`Error fetching related words for ${kanji}:`, error);
-                }
+            // 각 한자로 병렬 검색하여 관련 단어 수집
+            const results = await Promise.all(
+                kanjiList.map(async (kanji) => {
+                    try {
+                        const data = await searchKanji(kanji);
+                        return (data.data || []) as WordData[];
+                    } catch (error) {
+                        console.error(`Error fetching related words for ${kanji}:`, error);
+                        return [];
+                    }
+                })
+            );
+
+            // 더 최신 요청이 시작됐으면 이 결과는 버림
+            if (cancelled) return;
+
+            const uniqueWords = new Map<string, WordData>();
+            for (const word of results.flat()) {
+                if (extractKanjiFromWordObject(word).length === 0) continue;
+                // JLPT 레벨 필터링 (선택된 레벨이 없으면 전체 허용)
+                if (levels.length > 0 && !matchesJLPTLevels(word.jlpt, levels)) continue;
+                uniqueWords.set(getWordKey(word), word);
             }
 
-            const uniqueWords = Array.from(relatedWords)
-                .map((wordStr) => JSON.parse(wordStr as string))
-                .filter((word) => {
-                    // JLPT 레벨 필터링
-                    if (currentJLPTLevels.length > 0) {
-                        return (
-                            word.jlpt &&
-                            Array.isArray(word.jlpt) &&
-                            word.jlpt.some((level: string) => currentJLPTLevels.includes(level))
-                        );
-                    }
-                    return true;
-                })
-                .slice(0, 8); // 최대 8개만 표시
-
-            setRecommendations(uniqueWords);
-        } catch (error) {
-            console.error('Error fetching related words:', error);
-            setRecommendations([]);
-        } finally {
+            setRecommendations(Array.from(uniqueWords.values()).slice(0, 8)); // 최대 8개만 표시
             setLoading(false);
-        }
-    };
+        };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleWordClick = (word: any) => {
+        fetchRelatedWords();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [kanjiKey, levelsKey]);
+
+    const handleWordClick = (word: WordData) => {
         if (!word) return;
 
         try {
@@ -138,17 +133,14 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
                                             {word.japanese?.[0]?.reading || '읽기 없음'}
                                         </div>
                                         <div className='rec-meaning'>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                             {word.senses
-                                                ?.flatMap(
-                                                    (sense: any) => sense.english_definitions || []
-                                                )
+                                                ?.flatMap((sense) => sense.english_definitions || [])
                                                 .filter(Boolean)
                                                 .slice(0, 2)
                                                 .join(', ') || '의미 없음'}
                                         </div>
                                         {word.jlpt?.[0] && (
-                                            <span className='rec-jlpt'>{word.jlpt[0]}</span>
+                                            <span className='rec-jlpt'>{formatJLPT(word.jlpt[0])}</span>
                                         )}
                                     </button>
                                 ))}
@@ -188,15 +180,14 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
                                                 {word.japanese[0]?.reading}
                                             </div>
                                             <div className='rec-meaning'>
-                                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                 {word.senses
-                                                    .flatMap(
-                                                        (sense: any) => sense.english_definitions
-                                                    )
+                                                    .flatMap((sense) => sense.english_definitions)
                                                     .slice(0, 2)
                                                     .join(', ')}
                                             </div>
-                                            <span className='rec-jlpt'>{word.jlpt?.[0]}</span>
+                                            <span className='rec-jlpt'>
+                                                {word.jlpt?.[0] && formatJLPT(word.jlpt[0])}
+                                            </span>
                                         </button>
                                     ))}
                             </div>

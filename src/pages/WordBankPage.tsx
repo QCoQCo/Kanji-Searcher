@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useWordBank } from '../hooks/useWordBank';
+import { formatJLPT } from '../utils/jlpt';
 import './WordBankPage.css';
 
 const WordBankPage: React.FC = () => {
@@ -69,7 +70,7 @@ const WordBankPage: React.FC = () => {
                                             <div className='word-bank-jlpt'>
                                                 {item.word.jlpt.map((level, index) => (
                                                     <span key={index} className='jlpt-tag'>
-                                                        {level.toUpperCase()}
+                                                        {formatJLPT(level)}
                                                     </span>
                                                 ))}
                                             </div>

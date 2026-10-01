@@ -1,194 +1,179 @@
-// 로마지 -> 히라가나 변환 시스템
-// 효율적이고 체계적인 구조로 개선
+// 로마지 -> 히라가나 변환
+// 앞에서부터 가장 긴 매칭을 우선 변환하고, 아직 확정할 수 없는 꼬리(예: 'k', 'sh', 'n')는 remaining으로 남긴다.
 
-// 기본 모음 매핑
-const VOWELS: Record<string, string> = {
-    a: 'あ',
-    i: 'い',
-    u: 'う',
-    e: 'え',
-    o: 'お',
+const VOWELS = new Set(['a', 'i', 'u', 'e', 'o']);
+
+// 요음(ゃゅょ) 조합을 만드는 헬퍼: prefix + ya/yu/yo
+const withYoon = (prefix: string, base: string): Record<string, string> => ({
+    [`${prefix}a`]: `${base}ゃ`,
+    [`${prefix}u`]: `${base}ゅ`,
+    [`${prefix}o`]: `${base}ょ`,
+});
+
+const ROMAJI_MAP: Record<string, string> = {
+    // 모음
+    a: 'あ', i: 'い', u: 'う', e: 'え', o: 'お',
+
+    // か행
+    ka: 'か', ki: 'き', ku: 'く', ke: 'け', ko: 'こ',
+    ga: 'が', gi: 'ぎ', gu: 'ぐ', ge: 'げ', go: 'ご',
+    ...withYoon('ky', 'き'),
+    ...withYoon('gy', 'ぎ'),
+
+    // さ행
+    sa: 'さ', si: 'し', shi: 'し', su: 'す', se: 'せ', so: 'そ',
+    za: 'ざ', zi: 'じ', ji: 'じ', zu: 'ず', ze: 'ぜ', zo: 'ぞ',
+    ...withYoon('sy', 'し'),
+    ...withYoon('sh', 'し'),
+    she: 'しぇ',
+    ...withYoon('zy', 'じ'),
+    ...withYoon('jy', 'じ'),
+    ...withYoon('j', 'じ'),
+    je: 'じぇ',
+
+    // た행
+    ta: 'た', ti: 'ち', chi: 'ち', tu: 'つ', tsu: 'つ', te: 'て', to: 'と',
+    da: 'だ', di: 'ぢ', du: 'づ', de: 'で', do: 'ど',
+    ...withYoon('ty', 'ち'),
+    ...withYoon('cy', 'ち'),
+    ...withYoon('ch', 'ち'),
+    che: 'ちぇ',
+    ...withYoon('dy', 'ぢ'),
+
+    // な행
+    na: 'な', ni: 'に', nu: 'ぬ', ne: 'ね', no: 'の',
+    ...withYoon('ny', 'に'),
+
+    // は행
+    ha: 'は', hi: 'ひ', hu: 'ふ', fu: 'ふ', he: 'へ', ho: 'ほ',
+    ba: 'ば', bi: 'び', bu: 'ぶ', be: 'べ', bo: 'ぼ',
+    pa: 'ぱ', pi: 'ぴ', pu: 'ぷ', pe: 'ぺ', po: 'ぽ',
+    fa: 'ふぁ', fi: 'ふぃ', fe: 'ふぇ', fo: 'ふぉ',
+    ...withYoon('hy', 'ひ'),
+    ...withYoon('by', 'び'),
+    ...withYoon('py', 'ぴ'),
+
+    // ま행
+    ma: 'ま', mi: 'み', mu: 'む', me: 'め', mo: 'も',
+    ...withYoon('my', 'み'),
+
+    // や행
+    ya: 'や', yu: 'ゆ', yo: 'よ',
+
+    // ら행
+    ra: 'ら', ri: 'り', ru: 'る', re: 'れ', ro: 'ろ',
+    ...withYoon('ry', 'り'),
+
+    // わ행
+    wa: 'わ', wi: 'うぃ', we: 'うぇ', wo: 'を',
+    vu: 'ゔ',
+
+    // 작은 글자 (x- / l- 접두)
+    xa: 'ぁ', xi: 'ぃ', xu: 'ぅ', xe: 'ぇ', xo: 'ぉ',
+    la: 'ぁ', li: 'ぃ', lu: 'ぅ', le: 'ぇ', lo: 'ぉ',
+    xya: 'ゃ', xyu: 'ゅ', xyo: 'ょ',
+    lya: 'ゃ', lyu: 'ゅ', lyo: 'ょ',
+    xtu: 'っ', xtsu: 'っ', ltu: 'っ', ltsu: 'っ',
+    xwa: 'ゎ', lwa: 'ゎ',
+
+    // 기호
+    '-': 'ー',
 };
 
-// 자음 + 모음 조합 매핑
-const CONSONANT_VOWEL_COMBINATIONS: Record<string, Record<string, string>> = {
-    k: { a: 'か', i: 'き', u: 'く', e: 'け', o: 'こ' },
-    g: { a: 'が', i: 'ぎ', u: 'ぐ', e: 'げ', o: 'ご' },
-    s: { a: 'さ', i: 'し', u: 'す', e: 'せ', o: 'そ' },
-    z: { a: 'ざ', i: 'じ', u: 'ず', e: 'ぜ', o: 'ぞ' },
-    t: { a: 'た', i: 'ち', u: 'つ', e: 'て', o: 'と' },
-    d: { a: 'だ', i: 'ぢ', u: 'づ', e: 'で', o: 'ど' },
-    n: { a: 'な', i: 'に', u: 'ぬ', e: 'ね', o: 'の' },
-    h: { a: 'は', i: 'ひ', u: 'ふ', e: 'へ', o: 'ほ' },
-    b: { a: 'ば', i: 'び', u: 'ぶ', e: 'べ', o: 'ぼ' },
-    p: { a: 'ぱ', i: 'ぴ', u: 'ぷ', e: 'ぺ', o: 'ぽ' },
-    m: { a: 'ま', i: 'み', u: 'む', e: 'め', o: 'も' },
-    r: { a: 'ら', i: 'り', u: 'る', e: 'れ', o: 'ろ' },
-    w: { a: 'わ', i: 'ゐ', u: '', e: 'ゑ', o: 'を' },
-};
+const ROMAJI_KEYS = Object.keys(ROMAJI_MAP);
+const MAX_KEY_LENGTH = Math.max(...ROMAJI_KEYS.map((key) => key.length));
 
-// 특수 조합 매핑
-const SPECIAL_COMBINATIONS: Record<string, string> = {
-    fu: 'ふ',
-    dji: 'ぢ',
-    dzu: 'づ',
-    xtu: 'っ',
-    ya: 'や',
-    yu: 'ゆ',
-    yo: 'よ',
-    ji: 'じ',
-    n: 'ん',
-};
+const isVowel = (ch: string | undefined) => ch !== undefined && VOWELS.has(ch);
+const isConsonant = (ch: string | undefined) => ch !== undefined && /^[a-z]$/.test(ch) && !isVowel(ch);
 
-// 조합 문자 규칙 (きゃ, きゅ, きょ 등)
-const COMBINATION_RULES: Record<string, Record<string, string>> = {
-    k: { ya: 'きゃ', yu: 'きゅ', yo: 'きょ' },
-    g: { ya: 'ぎゃ', yu: 'ぎゅ', yo: 'ぎょ' },
-    s: { ya: 'しゃ', yu: 'しゅ', yo: 'しょ' },
-    j: { ya: 'じゃ', yu: 'じゅ', yo: 'じょ' },
-    t: { ya: 'ちゃ', yu: 'ちゅ', yo: 'ちょ' },
-    n: { ya: 'にゃ', yu: 'にゅ', yo: 'にょ' },
-    h: { ya: 'ひゃ', yu: 'ひゅ', yo: 'ひょ' },
-    b: { ya: 'びゃ', yu: 'びゅ', yo: 'びょ' },
-    p: { ya: 'ぴゃ', yu: 'ぴゅ', yo: 'ぴょ' },
-    m: { ya: 'みゃ', yu: 'みゅ', yo: 'みょ' },
-    r: { ya: 'りゃ', yu: 'りゅ', yo: 'りょ' },
-};
-
-// 성능 최적화를 위한 통합 매핑 (캐시)
-let INTEGRATED_MAP: Record<string, string> | null = null;
-
-// 통합 매핑 생성 함수
-function buildIntegratedMap(): Record<string, string> {
-    if (INTEGRATED_MAP) return INTEGRATED_MAP;
-
-    const map: Record<string, string> = { ...VOWELS, ...SPECIAL_COMBINATIONS };
-
-    // 자음 + 모음 조합 추가
-    Object.entries(CONSONANT_VOWEL_COMBINATIONS).forEach(([consonant, vowelMap]) => {
-        Object.entries(vowelMap).forEach(([vowel, hiragana]) => {
-            if (hiragana) {
-                map[consonant + vowel] = hiragana;
-            }
-        });
-    });
-
-    // 조합 문자 추가
-    Object.entries(COMBINATION_RULES).forEach(([consonant, combinationMap]) => {
-        Object.entries(combinationMap).forEach(([combination, hiragana]) => {
-            map[consonant + combination] = hiragana;
-        });
-    });
-
-    INTEGRATED_MAP = map;
-    return map;
-}
+// 더 입력하면 매핑이 완성될 수 있는 접두어인지 ('k', 'sh', 'xt' 등)
+const isIncompletePrefix = (text: string) =>
+    ROMAJI_KEYS.some((key) => key.length > text.length && key.startsWith(text));
 
 export interface ConversionResult {
-    converted: string;
-    remaining: string;
+    converted: string; // 확정된 히라가나
+    remaining: string; // 아직 확정할 수 없는 로마지 꼬리
 }
 
-export class RomajiConverter {
-    private static instance: RomajiConverter;
-    private integratedMap: Record<string, string>;
+/**
+ * 로마지를 히라가나로 변환
+ * @param final true면 남은 꼬리까지 모두 확정 (예: 끝의 'n' → 'ん')
+ */
+export function convertRomaji(input: string, final = false): ConversionResult {
+    const text = input.toLowerCase();
+    let converted = '';
+    let i = 0;
 
-    private constructor() {
-        this.integratedMap = buildIntegratedMap();
-    }
+    while (i < text.length) {
+        const ch = text[i];
+        const next = text[i + 1];
 
-    static getInstance(): RomajiConverter {
-        if (!RomajiConverter.instance) {
-            RomajiConverter.instance = new RomajiConverter();
-        }
-        return RomajiConverter.instance;
-    }
-
-    /**
-     * 로마지를 히라가나로 변환
-     */
-    convertRomajiToHiragana(input: string): ConversionResult {
-        let result = '';
-        let remaining = input.toLowerCase();
-
-        while (remaining.length > 0) {
-            let matched = false;
-
-            // 가장 긴 매칭을 우선으로 시도 (3글자, 2글자, 1글자 순)
-            for (let len = Math.min(3, remaining.length); len >= 1; len--) {
-                const substr = remaining.substring(0, len);
-                if (this.integratedMap[substr]) {
-                    result += this.integratedMap[substr];
-                    remaining = remaining.substring(len);
-                    matched = true;
-                    break;
+        // ん 처리
+        if (ch === 'n') {
+            if (next === undefined) {
+                // 'na', 'ni'… 가 될 수 있으므로 대기
+                if (!final) break;
+                converted += 'ん';
+                i += 1;
+                continue;
+            }
+            if (next === 'n') {
+                const after = text[i + 2];
+                if (after === undefined) {
+                    // 'nn' 다음에 모음이 오면 'ん + な행', 자음이 오면 'ん'으로 갈리므로 대기
+                    if (!final) break;
+                    converted += 'ん';
+                    i += 2;
+                    continue;
                 }
+                converted += 'ん';
+                // konnichiha: 'nn' + 모음/y → 두 번째 n은 다음 음절 (ん + に)
+                // shinnbun:   'nn' + 자음   → 'nn' 전체가 ん
+                i += isVowel(after) || after === 'y' ? 1 : 2;
+                continue;
             }
-
-            // 매칭되지 않은 경우 첫 글자를 그대로 추가
-            if (!matched) {
-                result += remaining[0];
-                remaining = remaining.substring(1);
+            if (!isVowel(next) && next !== 'y') {
+                // 'n' + 자음 (kanji, tenki) → ん
+                converted += 'ん';
+                i += 1;
+                continue;
             }
         }
 
-        return { converted: result, remaining: '' };
+        // 촉음: 같은 자음 반복 (kk, tt, ss …) 또는 'tch' → っ
+        if (isConsonant(ch) && ch !== 'n' && (next === ch || (ch === 't' && next === 'c'))) {
+            converted += 'っ';
+            i += 1;
+            continue;
+        }
+
+        // 가장 긴 매칭 우선
+        let matched = false;
+        for (let len = Math.min(MAX_KEY_LENGTH, text.length - i); len >= 1; len--) {
+            const hiragana = ROMAJI_MAP[text.slice(i, i + len)];
+            if (hiragana) {
+                converted += hiragana;
+                i += len;
+                matched = true;
+                break;
+            }
+        }
+        if (matched) continue;
+
+        // 아직 완성되지 않은 입력이면 대기
+        if (!final && isIncompletePrefix(text.slice(i))) break;
+
+        // 변환할 수 없는 문자는 그대로 출력 (확정 시 남은 'n'은 ん)
+        converted += ch === 'n' ? 'ん' : ch;
+        i += 1;
     }
 
-    /**
-     * 부분 매칭 확인 (자동완성용)
-     */
-    isPartialMatch(input: string): boolean {
-        const lower = input.toLowerCase();
-        return Object.keys(this.integratedMap).some(
-            (key) => key.startsWith(lower) && key !== lower
-        );
-    }
-
-    /**
-     * 자동완성 제안 목록 반환
-     */
-    getCompletions(input: string): string[] {
-        const lower = input.toLowerCase();
-        return Object.keys(this.integratedMap)
-            .filter((key) => key.startsWith(lower) && key !== lower)
-            .slice(0, 5); // 최대 5개 완성 제안
-    }
-
-    /**
-     * 특정 로마지가 완전한 히라가나로 변환 가능한지 확인
-     */
-    isValidRomaji(input: string): boolean {
-        return this.integratedMap[input.toLowerCase()] !== undefined;
-    }
-
-    /**
-     * 히라가나로 변환 가능한 모든 로마지 목록 반환
-     */
-    getAllValidRomaji(): string[] {
-        return Object.keys(this.integratedMap);
-    }
-
-    /**
-     * 캐시 초기화 (테스트용)
-     */
-    clearCache(): void {
-        INTEGRATED_MAP = null;
-        this.integratedMap = buildIntegratedMap();
-    }
+    return { converted, remaining: text.slice(i) };
 }
 
-// 기존 함수들과의 호환성을 위한 래퍼 함수들
-const converter = RomajiConverter.getInstance();
-
-export function convertRomajiToHiragana(input: string): ConversionResult {
-    return converter.convertRomajiToHiragana(input);
-}
-
-export function isPartialMatch(input: string): boolean {
-    return converter.isPartialMatch(input);
-}
-
-export function getCompletions(input: string): string[] {
-    return converter.getCompletions(input);
+/**
+ * 로마지 전체를 히라가나로 확정 변환 (남는 꼬리 없음)
+ */
+export function convertRomajiToHiragana(input: string): string {
+    return convertRomaji(input, true).converted;
 }
