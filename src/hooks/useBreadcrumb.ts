@@ -1,17 +1,12 @@
 import { useState, useCallback } from 'react';
-import type { BreadcrumbItem } from '../components/Breadcrumb';
+import type { BreadcrumbItem, SearchSource, WordData } from '../types/kanji';
 
 export function useBreadcrumb() {
     const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
 
     // 브레드크럼에 새 항목 추가
     const addBreadcrumbItem = useCallback(
-        (
-            query: string,
-            type: 'manual' | 'word-click' | 'kanji-click',
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            sourceData?: any
-        ) => {
+        (query: string, type: SearchSource, sourceData?: WordData) => {
             const newItem: BreadcrumbItem = {
                 id: `${Date.now()}-${Math.random()}`,
                 label: generateLabel(query, type, sourceData),
@@ -61,12 +56,7 @@ export function useBreadcrumb() {
 }
 
 // 브레드크럼 라벨 생성 헬퍼 함수
-function generateLabel(
-    query: string,
-    type: 'manual' | 'word-click' | 'kanji-click',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    sourceData?: any
-): string {
+function generateLabel(query: string, type: SearchSource, sourceData?: WordData): string {
     switch (type) {
         case 'manual':
             return `"${query}"`;

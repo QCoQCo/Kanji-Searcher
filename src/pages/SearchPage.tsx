@@ -11,7 +11,7 @@ import { useSearchHistory } from '../hooks/useSearchHistory';
 import { useVirtualKeyboard } from '../hooks/useVirtualKeyboard';
 import { useBreadcrumb } from '../hooks/useBreadcrumb';
 import { useSearch } from '../hooks/useSearch';
-import type { WordData } from '../types/kanji';
+import type { BreadcrumbItem, WordData } from '../types/kanji';
 import './SearchPage.css';
 
 const SearchPage: React.FC = () => {
@@ -83,8 +83,7 @@ const SearchPage: React.FC = () => {
     };
 
     // 브레드크럼 네비게이션 핸들러
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleBreadcrumbClick = (item: any) => {
+    const handleBreadcrumbClick = (item: BreadcrumbItem) => {
         const navigatedItem = breadcrumb.navigateToBreadcrumbItem(item);
         setQuery(navigatedItem.query);
 
@@ -118,7 +117,7 @@ const SearchPage: React.FC = () => {
 
     return (
         <div className='search-page'>
-            <div style={{ display: 'flex', gap: 16 }}>
+            <div className='search-bar'>
                 <input
                     type='text'
                     value={query}
@@ -132,18 +131,8 @@ const SearchPage: React.FC = () => {
                     Search
                 </button>
                 <button
-                    className='keyboard-toggle-btn'
+                    className={`keyboard-toggle-btn ${keyboard.isVisible ? 'active' : ''}`}
                     onClick={handleKeyboardToggle}
-                    style={{
-                        background: keyboard.isVisible ? '#00ff88' : '#404040',
-                        color: keyboard.isVisible ? '#000' : '#fff',
-                        border: '1px solid #555',
-                        borderRadius: '8px',
-                        padding: '8px 12px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        transition: 'all 0.2s ease',
-                    }}
                 >
                     🗾 일본어 키보드
                 </button>

@@ -2,53 +2,19 @@ import React from 'react';
 import './WordList.css';
 import { extractKanjiFromWordObject, hasKanji, getUniqueKanji } from '../utils/kanjiExtractor';
 import { formatJLPT } from '../utils/jlpt';
-import type { JapaneseReading, Sense } from '../types/kanji';
+import { getWordKey } from '../hooks/useWordBank';
+import type { WordData } from '../types/kanji';
 
 interface WordListProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    results: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onWordClick?: (wordObj: any, extractedKanji: string) => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    selectedWord?: any;
+    results: WordData[];
+    onWordClick?: (wordObj: WordData, extractedKanji: string) => void;
+    selectedWord?: WordData | null;
 }
 
 const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord }) => {
-    // 디버깅: 첫 번째 결과의 구조 확인
-    // React.useEffect(() => {
-    //   if (results.length > 0) {
-    //     console.log('WordList - First result structure:', results[0]);
-    //     console.log('WordList - All results:', results);
-    //   }
-    // }, [results]);
+    const selectedKey = selectedWord ? getWordKey(selectedWord) : null;
 
-    // 테스트용 mock 데이터 (API가 작동하지 않을 때 사용)
-    // const mockData = [
-    //   {
-    //     japanese: [
-    //       { word: '水', reading: 'みず' }
-    //     ],
-    //     senses: [
-    //       { english_definitions: ['water'] }
-    //     ],
-    //     jlpt: ['N5']
-    //   },
-    //   {
-    //     japanese: [
-    //       { word: '水曜日', reading: 'すいようび' }
-    //     ],
-    //     senses: [
-    //       { english_definitions: ['Wednesday'] }
-    //     ],
-    //     jlpt: ['N5']
-    //   }
-    // ];
-
-    // API 결과가 없으면 mock 데이터 사용 (테스트용)
-    // const displayResults = results.length > 0 ? results : mockData;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleWordClick = (item: any) => {
+    const handleWordClick = (item: WordData) => {
         if (onWordClick && item) {
             try {
                 const extractedKanji = extractKanjiFromWordObject(item);
@@ -79,19 +45,8 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
 
                 const kanjiText = extractKanjiFromWordObject(item);
                 const isClickable = hasKanji(kanjiText);
-                const isSelected =
-                    selectedWord &&
-                    (selectedWord.japanese?.[0]?.word === item.japanese?.[0]?.word ||
-                        selectedWord.japanese?.[0]?.reading === item.japanese?.[0]?.reading);
-
-                // 디버깅: 각 아이템의 데이터 확인
-                // console.log(`Item ${idx}:`, {
-                //   japanese: item.japanese,
-                //   senses: item.senses,
-                //   jlpt: item.jlpt,
-                //   kanjiText,
-                //   isClickable
-                // });
+                // 표기+읽기가 모두 같은 단어만 선택 표시 (읽기만 같은 동음이의어는 제외)
+                const isSelected = selectedKey !== null && getWordKey(item) === selectedKey;
 
                 return (
                     <div
@@ -108,14 +63,14 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                             <div className='reading'>
                                 읽기:{' '}
                                 {item.japanese
-                                    ?.map((j: JapaneseReading) => j.reading)
+                                    ?.map((j) => j.reading)
                                     .filter(Boolean)
                                     .join(', ') || '읽기 없음'}
                             </div>
                             <div className='meaning'>
                                 의미:{' '}
                                 {item.senses
-                                    ?.flatMap((sense: Sense) => sense.english_definitions || [])
+                                    ?.flatMap((sense) => sense.english_definitions || [])
                                     .filter(Boolean)
                                     .join(', ') || '의미 없음'}
                             </div>
@@ -126,7 +81,7 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                                 <div className='kanji-hint'>🔍 한자 분석: (클릭하여 상세보기)</div>
                                 <div className='kanji-chars'>
                                     {getUniqueKanji(kanjiText).map(
-                                        (char: string, charIdx: number) => (
+                                        (char, charIdx) => (
                                             <button
                                                 key={charIdx}
                                                 className='kanji-char-btn'

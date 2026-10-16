@@ -2,6 +2,8 @@
  * 일본어 텍스트에서 한자를 추출하는 유틸리티 함수들
  */
 
+import type { WordData } from '../types/kanji';
+
 // 한자: Unicode Script=Han (CJK 통합 한자 + 확장 영역 + 々, 〇)
 // 주의: /g 정규식은 .test()에서 lastIndex 상태가 남으므로 판정용과 추출용을 분리한다
 const KANJI_REGEX = /\p{Script=Han}/u;
@@ -50,27 +52,19 @@ export function getUniqueKanjiString(text: string): string {
 /**
  * 일본어 단어 객체에서 한자 추출 (Jisho API 응답 형태)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function extractKanjiFromWordObject(wordObj: any): string {
-    if (!wordObj || typeof wordObj !== 'object') {
+export function extractKanjiFromWordObject(wordObj: WordData | null | undefined): string {
+    // 외부 API 데이터라 형식이 어긋날 수 있으므로 런타임 검사는 유지
+    if (!wordObj || !Array.isArray(wordObj.japanese)) {
         return '';
     }
 
     let kanjiText = '';
 
-    // japanese 배열에서 word 또는 reading 확인
-    if (wordObj.japanese && Array.isArray(wordObj.japanese)) {
-        for (const jpItem of wordObj.japanese) {
-            if (jpItem && typeof jpItem === 'object') {
-                // word가 있으면 word에서 한자 추출 (우선순위)
-                if (jpItem.word && typeof jpItem.word === 'string') {
-                    kanjiText += jpItem.word;
-                }
-                // word가 없고 reading에 한자가 있으면 reading에서 추출
-                else if (jpItem.reading && typeof jpItem.reading === 'string') {
-                    kanjiText += jpItem.reading;
-                }
-            }
+    for (const jpItem of wordObj.japanese) {
+        // word가 있으면 word에서 한자 추출 (우선순위), 없으면 reading에서 추출
+        const text = jpItem?.word || jpItem?.reading;
+        if (typeof text === 'string') {
+            kanjiText += text;
         }
     }
 

@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { searchKanji, fetchKanjiInfo } from '../apis/jishoApi';
 import { isKanji } from '../utils/kanjiExtractor';
-import type { KanjiData, WordData, SearchSource, JLPTLevel } from '../types/kanji';
+import type { KanjiData, KanjiApiResponse, WordData, SearchSource, JLPTLevel } from '../types/kanji';
 
 interface SearchState {
     kanjiResults: KanjiData[];
@@ -19,8 +19,7 @@ interface UseSearchReturn extends SearchState {
     clearResults: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseKanjiApiResponse(data: any): KanjiData {
+function parseKanjiApiResponse(data: KanjiApiResponse): KanjiData {
     return {
         kanji: data.kanji,
         readings: {

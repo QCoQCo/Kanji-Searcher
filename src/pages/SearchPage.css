@@ -8,6 +8,11 @@
 
 /* Header styles moved to global Header component */
 
+.search-bar {
+    display: flex;
+    gap: 16px;
+}
+
 .search-page .search-btn {
     background: #404040;
     color: #fff;
@@ -217,8 +222,8 @@
     }
 
     .keyboard-toggle-btn {
-        padding: 6px 10px !important;
-        font-size: 12px !important;
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
     .section-header {

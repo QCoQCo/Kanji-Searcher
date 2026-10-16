@@ -43,13 +43,24 @@ export interface JishoApiResponse {
     };
 }
 
+// kanjiapi.dev /v1/kanji/{char} 응답 (사용하는 필드만)
+export interface KanjiApiResponse {
+    kanji: string;
+    kun_readings?: string[];
+    on_readings?: string[];
+    meanings?: string[];
+    jlpt?: number | null;
+    stroke_count?: number;
+}
+
 // 검색 소스 타입
 export type SearchSource = 'manual' | 'word-click' | 'kanji-click';
 
 // 브레드크럼 아이템 타입
 export interface BreadcrumbItem {
+    id: string;
+    label: string;
     query: string;
     type: SearchSource;
-    wordData?: WordData;
     timestamp: number;
 }

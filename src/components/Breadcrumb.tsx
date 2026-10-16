@@ -1,13 +1,6 @@
 import React from 'react';
+import type { BreadcrumbItem, SearchSource } from '../types/kanji';
 import './Breadcrumb.css';
-
-export interface BreadcrumbItem {
-    id: string;
-    label: string;
-    query: string;
-    type: 'manual' | 'word-click' | 'kanji-click';
-    timestamp: number;
-}
 
 interface BreadcrumbProps {
     items: BreadcrumbItem[];
@@ -18,7 +11,7 @@ interface BreadcrumbProps {
 const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, onItemClick, onClear }) => {
     if (items.length === 0) return null;
 
-    const getIcon = (type: string) => {
+    const getIcon = (type: SearchSource) => {
         switch (type) {
             case 'manual':
                 return '🔍';
