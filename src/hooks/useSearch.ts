@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { searchKanji, fetchKanjiInfo } from '../apis/jishoApi';
+import { isKanji } from '../utils/kanjiExtractor';
 import type { KanjiData, WordData, SearchSource, JLPTLevel } from '../types/kanji';
 
 interface SearchState {
@@ -44,6 +45,12 @@ export function useSearch(
         searchSource: 'manual',
     });
 
+    // 완료 콜백은 부모가 매 렌더 새로 만들어 넘기므로 ref로 최신 값만 유지 (의존성에서 제외)
+    const onSearchCompleteRef = useRef(onSearchComplete);
+    useEffect(() => {
+        onSearchCompleteRef.current = onSearchComplete;
+    });
+
     const clearResults = useCallback(() => {
         setState((prev) => ({
             ...prev,
@@ -73,7 +80,7 @@ export function useSearch(
                 }
 
                 // 한자 검색
-                const kanjiChars = Array.from(query).filter((ch) => /[一-龯々]/.test(ch));
+                const kanjiChars = Array.from(query).filter(isKanji);
                 const kanjiDataArr: KanjiData[] = [];
 
                 if (kanjiChars.length > 0) {
@@ -99,7 +106,7 @@ export function useSearch(
                     loading: false,
                 }));
 
-                onSearchComplete?.(query, source);
+                onSearchCompleteRef.current?.(query, source);
             } catch (error) {
                 console.error('Search error:', error);
                 setState((prev) => ({
@@ -110,13 +117,16 @@ export function useSearch(
                 }));
             }
         },
-        [getActiveLevels, onSearchComplete]
+        [getActiveLevels]
     );
 
-    const handleWordClick = useCallback((wordObj: WordData, extractedKanji: string) => {
-        setState((prev) => ({ ...prev, selectedWord: wordObj }));
-        handleSearch(extractedKanji, 'word-click');
-    }, []);
+    const handleWordClick = useCallback(
+        (wordObj: WordData, extractedKanji: string) => {
+            setState((prev) => ({ ...prev, selectedWord: wordObj }));
+            handleSearch(extractedKanji, 'word-click');
+        },
+        [handleSearch]
+    );
 
     const handleManualSearch = useCallback(
         (query?: string) => {

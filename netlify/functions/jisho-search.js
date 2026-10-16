@@ -1,55 +1,50 @@
 const axios = require('axios');
 
-// CORS 프록시를 통한 Jisho API 호출
-async function searchWithCorsProxy(keyword) {
-  try {
-    // cors-anywhere 프록시 사용
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(keyword)}`;
-    
-    const response = await axios.get(proxyUrl + jishoUrl, {
-      timeout: 15000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Origin': 'https://jisho.org'
+const JISHO_SEARCH_URL = 'https://jisho.org/api/v1/search/words';
+const MAX_ATTEMPTS = 2; // 일시적 오류(네트워크/5xx)에 한해 1회 재시도
+const RETRY_DELAY_MS = 500;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// 네트워크 오류(응답 없음)나 서버 오류(5xx)만 재시도 대상
+const isRetryable = (error) => !error.response || error.response.status >= 500;
+
+async function searchJisho(keyword) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await axios.get(JISHO_SEARCH_URL, {
+        params: { keyword },
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Accept': 'application/json',
+          'Accept-Language': 'en-US,en;q=0.9,ja;q=0.8',
+        }
+      });
+      return response.data;
+    } catch (error) {
+      lastError = error;
+      console.error(`Jisho API attempt ${attempt} failed:`, error.message);
+
+      if (attempt < MAX_ATTEMPTS && isRetryable(error)) {
+        await sleep(RETRY_DELAY_MS);
+        continue;
       }
-    });
-    
-    return response.data;
-  } catch (error) {
-    console.error('CORS proxy failed:', error.message);
-    throw error;
+      break;
+    }
   }
+
+  throw lastError;
 }
 
-// 대체 API 함수
-async function searchWithAlternativeAPI(keyword) {
-  try {
-    // Weblio API 시도 (대체 옵션)
-    const response = await axios.get(`https://api.weblio.jp/v1/wordSearch`, {
-      params: { 
-        query: keyword,
-        key: process.env.WEBLIO_API_KEY || 'demo' // 실제 API 키가 필요할 수 있음
-      },
-      timeout: 10000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
-    });
-    
-    return response.data;
-  } catch (error) {
-    console.error('Alternative API also failed:', error.message);
-    throw error;
-  }
-}
-
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   // CORS 헤더 설정
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+    'Access-Control-Allow-Methods': 'GET, OPTIONS'
   };
 
   // OPTIONS 요청 처리 (preflight)
@@ -61,85 +56,46 @@ exports.handler = async (event, context) => {
     };
   }
 
+  const { keyword } = event.queryStringParameters || {};
+
+  if (!keyword) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Keyword is required' })
+    };
+  }
+
   try {
-    const { keyword } = event.queryStringParameters || {};
-    
-    if (!keyword) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Keyword is required' })
-      };
-    }
-
-    console.log(`Searching for keyword: ${keyword}`);
-
-    let response;
-    let source = 'jisho';
-
-    // 1. 직접 Jisho API 시도
-    try {
-      response = await axios.get(`https://jisho.org/api/v1/search/words`, {
-        params: { keyword },
-        timeout: 15000,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-          'Accept': 'application/json',
-          'Accept-Language': 'en-US,en;q=0.9,ja;q=0.8',
-          'Referer': 'https://jisho.org/',
-          'Origin': 'https://jisho.org'
-        }
-      });
-
-      console.log(`Jisho API response status: ${response.status}`);
-    } catch (jishoError) {
-      console.error('Direct Jisho API failed, trying CORS proxy:', jishoError.message);
-      
-      // 2. CORS 프록시 시도
-      try {
-        response = await searchWithCorsProxy(keyword);
-        source = 'cors-proxy';
-        console.log('Using CORS proxy');
-      } catch (proxyError) {
-        console.error('CORS proxy failed, trying alternative API:', proxyError.message);
-        
-        // 3. 대체 API 시도
-        try {
-          response = await searchWithAlternativeAPI(keyword);
-          source = 'alternative';
-          console.log('Using alternative API');
-        } catch (altError) {
-          // 모든 방법이 실패하면 원래 에러를 던짐
-          throw jishoError;
-        }
-      }
-    }
+    const data = await searchJisho(keyword);
 
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        ...response.data,
-        _source: source
-      })
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+        // 사전 데이터는 자주 바뀌지 않으므로 CDN에서 하루 캐싱
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400'
+      },
+      body: JSON.stringify(data)
     };
   } catch (error) {
-    console.error('All API methods failed:', {
+    console.error('Jisho API failed:', {
       message: error.message,
       status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data
+      statusText: error.response?.statusText
     });
-    
+
+    // 응답이 없으면(타임아웃·네트워크) 502로 업스트림 실패를 표시
     return {
-      statusCode: error.response?.status || 500,
+      statusCode: error.response?.status || 502,
       headers,
-      body: JSON.stringify({ 
-        error: 'Failed to fetch data from all available APIs',
+      body: JSON.stringify({
+        error: 'Failed to fetch data from Jisho API',
         details: error.message,
         status: error.response?.status,
         statusText: error.response?.statusText
       })
     };
   }
-}; 
+};

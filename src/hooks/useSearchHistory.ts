@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { hasKanji } from '../utils/kanjiExtractor';
+import { hasKanji, isOnlyKanji } from '../utils/kanjiExtractor';
 
 export interface SearchHistoryItem {
     query: string;
@@ -23,7 +23,7 @@ export const useSearchHistory = () => {
 
     const addToHistory = (query: string) => {
         const isKanjiSearch = hasKanji(query);
-        const isOnlyKanji = /^[一-龯々]+$/.test(query);
+        const isKanjiOnly = isOnlyKanji(query);
 
         setHistory((prev) => {
             const existingItem = prev.find((item) => item.query === query);
@@ -34,7 +34,7 @@ export const useSearchHistory = () => {
                 timestamp: Date.now(),
                 frequency: existingItem ? existingItem.frequency + 1 : 1,
                 isFavorite: existingItem ? existingItem.isFavorite : false,
-                type: isOnlyKanji ? 'kanji' : isKanjiSearch ? 'mixed' : 'word',
+                type: isKanjiOnly ? 'kanji' : isKanjiSearch ? 'mixed' : 'word',
             };
 
             const newHistory = [newItem, ...filtered].slice(0, 50);
@@ -130,8 +130,7 @@ export const useSearchHistory = () => {
             } else {
                 // type이 없으면 query를 분석해서 자동 판정
                 const isKanjiSearch = hasKanji(item.query);
-                const isOnlyKanji = /^[一-龯々]+$/.test(item.query);
-                type = isOnlyKanji ? 'kanji' : isKanjiSearch ? 'mixed' : 'word';
+                type = isOnlyKanji(item.query) ? 'kanji' : isKanjiSearch ? 'mixed' : 'word';
             }
 
             cleanedHistory.push({

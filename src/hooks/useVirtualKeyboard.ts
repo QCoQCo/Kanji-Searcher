@@ -91,8 +91,11 @@ export function useVirtualKeyboard() {
             // 가상 키보드가 활성화되어 있을 때만 처리
             if (!isVisible) return;
 
-            // 기본 동작 방지 (특정 키들만)
-            if (event.key.length === 1 || ['Backspace', 'Space'].includes(event.key)) {
+            // Cmd/Ctrl/Alt 조합(복사·붙여넣기·새로고침 등)은 브라우저 기본 동작에 맡김
+            if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+            // 기본 동작 방지 (글자 키, 스페이스(' '), 백스페이스)
+            if (event.key.length === 1 || event.key === 'Backspace') {
                 event.preventDefault();
             }
 
@@ -105,7 +108,7 @@ export function useVirtualKeyboard() {
             } else if (event.key === ' ') {
                 handleSpace();
             } else if (event.key === 'Escape') {
-                setIsVisible(false);
+                hideKeyboard();
             } else if (event.key.length === 1 && /^[a-zA-Z-]$/.test(event.key)) {
                 // 알파벳과 장음(-)만 처리
                 handleAddToBuffer(event.key.toLowerCase());
@@ -115,10 +118,9 @@ export function useVirtualKeyboard() {
         const handleKeyUp = (event: KeyboardEvent) => {
             if (!isVisible) return;
 
-            // 키 활성화 해제
-            if (activeKey === event.key.toLowerCase()) {
-                setActiveKey(null);
-            }
+            // 키 활성화 해제 (함수형 업데이트로 activeKey를 의존성에서 제외)
+            const releasedKey = event.key.toLowerCase();
+            setActiveKey((prev) => (prev === releasedKey ? null : prev));
         };
 
         if (isVisible) {
@@ -130,7 +132,7 @@ export function useVirtualKeyboard() {
             document.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keyup', handleKeyUp);
         };
-    }, [isVisible, activeKey, handleAddToBuffer, handleBackspace, handleSpace]);
+    }, [isVisible, hideKeyboard, handleAddToBuffer, handleBackspace, handleSpace]);
 
     const getCurrentText = useCallback(() => {
         return convertedText + inputBuffer;

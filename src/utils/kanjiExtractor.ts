@@ -2,14 +2,24 @@
  * 일본어 텍스트에서 한자를 추출하는 유틸리티 함수들
  */
 
-// 한자 유니코드 범위: 一-龯 (CJK Unified Ideographs) + 々 (iteration mark)
-const KANJI_REGEX = /[一-龯々]/g;
+// 한자: Unicode Script=Han (CJK 통합 한자 + 확장 영역 + 々, 〇)
+// 주의: /g 정규식은 .test()에서 lastIndex 상태가 남으므로 판정용과 추출용을 분리한다
+const KANJI_REGEX = /\p{Script=Han}/u;
+const KANJI_REGEX_GLOBAL = /\p{Script=Han}/gu;
+const ONLY_KANJI_REGEX = /^\p{Script=Han}+$/u;
 
 /**
  * 단일 문자가 한자인지 확인
  */
 export function isKanji(char: string): boolean {
-    return /[一-龯々]/.test(char);
+    return KANJI_REGEX.test(char);
+}
+
+/**
+ * 텍스트가 한자로만 이루어져 있는지 확인
+ */
+export function isOnlyKanji(text: string): boolean {
+    return ONLY_KANJI_REGEX.test(text);
 }
 
 /**
@@ -18,7 +28,7 @@ export function isKanji(char: string): boolean {
 export function extractKanjiFromText(text: string): string[] {
     if (!text) return [];
 
-    const matches = text.match(KANJI_REGEX);
+    const matches = text.match(KANJI_REGEX_GLOBAL);
     return matches || [];
 }
 
@@ -89,7 +99,7 @@ export function separateKanjiAndNonKanji(text: string): {
     nonKanji: string;
 } {
     const kanji = extractKanjiFromText(text);
-    const nonKanji = text.replace(KANJI_REGEX, '');
+    const nonKanji = text.replace(KANJI_REGEX_GLOBAL, '');
 
     return { kanji, nonKanji };
 }

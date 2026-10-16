@@ -52,7 +52,7 @@ const SearchPage: React.FC = () => {
         setQuery(extractedKanji);
 
         // 브레드크럼에 추가
-        const isKanjiClick = extractedKanji.length === 1;
+        const isKanjiClick = Array.from(extractedKanji).length === 1; // 확장 영역 한자(서로게이트 쌍) 대응
         breadcrumb.addBreadcrumbItem(
             extractedKanji,
             isKanjiClick ? 'kanji-click' : 'word-click',
@@ -93,12 +93,21 @@ const SearchPage: React.FC = () => {
         setQuery(fullText);
     };
 
-    // 키보드 입력이 변경될 때마다 query 업데이트
-    React.useEffect(() => {
-        if (keyboard.isVisible) {
-            handleKeyboardInput();
+    // 키보드를 열 때 현재 검색어를 넘겨서 이어서 편집 (빈 키보드 텍스트로 검색어가 지워지지 않게)
+    const handleKeyboardToggle = () => {
+        if (!keyboard.isVisible) {
+            keyboard.setText(query);
         }
-    }, [keyboard.convertedText, keyboard.inputBuffer, keyboard.isVisible]);
+        keyboard.toggleKeyboard();
+    };
+
+    // 키보드 입력이 변경될 때마다 query 업데이트 (getFullText는 키보드 텍스트가 바뀔 때만 새로 만들어짐)
+    const { isVisible: isKeyboardVisible, getFullText } = keyboard;
+    React.useEffect(() => {
+        if (isKeyboardVisible) {
+            setQuery(getFullText());
+        }
+    }, [isKeyboardVisible, getFullText]);
 
     return (
         <div className='search-page'>
@@ -117,7 +126,7 @@ const SearchPage: React.FC = () => {
                 </button>
                 <button
                     className='keyboard-toggle-btn'
-                    onClick={keyboard.toggleKeyboard}
+                    onClick={handleKeyboardToggle}
                     style={{
                         background: keyboard.isVisible ? '#00ff88' : '#404040',
                         color: keyboard.isVisible ? '#000' : '#fff',
