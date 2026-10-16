@@ -22,6 +22,9 @@ export const useRandomWords = (options: UseRandomWordsOptions = {}) => {
     const deckPositionRef = useRef(0);
     const lastDrawnIndexRef = useRef<number | null>(null);
 
+    // 가장 최근 단어 풀 요청 번호 (레벨을 빠르게 바꿀 때 늦게 온 이전 응답 무시)
+    const latestRequestIdRef = useRef(0);
+
     const createShuffledDeck = (size: number): number[] => {
         const deck = Array.from({ length: size }, (_, i) => i);
         for (let i = deck.length - 1; i > 0; i--) {
@@ -64,11 +67,15 @@ export const useRandomWords = (options: UseRandomWordsOptions = {}) => {
 
     // 선택된 레벨들의 단어 풀을 가져오는 함수
     const fetchWordPool = async (levels: JLPTLevel[]) => {
+        const requestId = ++latestRequestIdRef.current;
+        const isStale = () => requestId !== latestRequestIdRef.current;
+
         setIsLoading(true);
         setError(null);
 
         try {
             const words = await fetchWordsForLevels(levels);
+            if (isStale()) return;
 
             if (words.length > 0) {
                 setAllWords(words);
@@ -82,12 +89,15 @@ export const useRandomWords = (options: UseRandomWordsOptions = {}) => {
                 setCurrentWords([]);
             }
         } catch (err) {
+            if (isStale()) return;
             console.error('Error fetching word pool:', err);
             setError(`Failed to load vocabulary for ${levels.join(', ')}. Please try again.`);
             setAllWords([]);
             setCurrentWords([]);
         } finally {
-            setIsLoading(false);
+            if (!isStale()) {
+                setIsLoading(false);
+            }
         }
     };
 

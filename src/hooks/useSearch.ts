@@ -9,6 +9,7 @@ interface SearchState {
     loading: boolean;
     selectedWord: WordData | null;
     searchSource: SearchSource;
+    hasSearched: boolean; // 검색을 한 번이라도 완료했는지 (첫 화면 안내 표시용)
 }
 
 interface UseSearchReturn extends SearchState {
@@ -43,7 +44,11 @@ export function useSearch(
         loading: false,
         selectedWord: null,
         searchSource: 'manual',
+        hasSearched: false,
     });
+
+    // 가장 최근 검색 요청 번호 (늦게 도착한 이전 검색 결과가 최신 결과를 덮어쓰지 않도록)
+    const latestRequestIdRef = useRef(0);
 
     // 완료 콜백은 부모가 매 렌더 새로 만들어 넘기므로 ref로 최신 값만 유지 (의존성에서 제외)
     const onSearchCompleteRef = useRef(onSearchComplete);
@@ -64,6 +69,9 @@ export function useSearch(
         async (query: string, source: SearchSource = 'manual') => {
             if (!query.trim()) return;
 
+            const requestId = ++latestRequestIdRef.current;
+            const isStale = () => requestId !== latestRequestIdRef.current;
+
             setState((prev) => ({ ...prev, loading: true, searchSource: source }));
 
             try {
@@ -79,41 +87,46 @@ export function useSearch(
                     }
                 }
 
-                // 한자 검색
-                const kanjiChars = Array.from(query).filter(isKanji);
-                const kanjiDataArr: KanjiData[] = [];
+                // 한자 검색 (중복 글자 제거 후 병렬 요청, 입력 순서 유지)
+                const kanjiChars = Array.from(new Set(Array.from(query).filter(isKanji)));
+                const activeLevels = getActiveLevels();
 
-                if (kanjiChars.length > 0) {
-                    const activeLevels = getActiveLevels();
-
-                    for (const ch of kanjiChars) {
+                const kanjiInfos = await Promise.all(
+                    kanjiChars.map(async (ch) => {
                         try {
-                            const res = await fetchKanjiInfo(ch);
-                            const parsed = parseKanjiApiResponse(res);
-                            if (!parsed.jlpt || activeLevels.includes(parsed.jlpt)) {
-                                kanjiDataArr.push(parsed);
-                            }
+                            return parseKanjiApiResponse(await fetchKanjiInfo(ch));
                         } catch (error) {
                             console.error(`Error fetching kanji info for ${ch}:`, error);
+                            return null;
                         }
-                    }
-                }
+                    })
+                );
+
+                const kanjiDataArr = kanjiInfos.filter(
+                    (info): info is KanjiData =>
+                        info !== null && (!info.jlpt || activeLevels.includes(info.jlpt))
+                );
+
+                if (isStale()) return;
 
                 setState((prev) => ({
                     ...prev,
                     kanjiResults: kanjiDataArr,
                     wordResults: source === 'word-click' ? prev.wordResults : wordResults,
                     loading: false,
+                    hasSearched: true,
                 }));
 
                 onSearchCompleteRef.current?.(query, source);
             } catch (error) {
                 console.error('Search error:', error);
+                if (isStale()) return;
                 setState((prev) => ({
                     ...prev,
                     kanjiResults: [],
                     wordResults: source === 'word-click' ? prev.wordResults : [],
                     loading: false,
+                    hasSearched: true,
                 }));
             }
         },

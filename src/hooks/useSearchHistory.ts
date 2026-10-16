@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { hasKanji, isOnlyKanji } from '../utils/kanjiExtractor';
+import { readStorageArray, writeStorage, removeStorage } from '../utils/storage';
 
 export interface SearchHistoryItem {
     query: string;
@@ -11,20 +12,49 @@ export interface SearchHistoryItem {
 
 const STORAGE_KEY = 'kanjiSearchHistory';
 
-export const useSearchHistory = () => {
-    const [history, setHistory] = useState<SearchHistoryItem[]>([]);
+// 검색어를 분석해 기록 타입 판정
+const getSearchType = (query: string): SearchHistoryItem['type'] =>
+    isOnlyKanji(query) ? 'kanji' : hasKanji(query) ? 'mixed' : 'word';
 
+// 저장소·가져오기 파일의 기록 항목을 검증하고 누락된 필드는 기본값으로 채움 (query/timestamp가 없으면 null)
+const normalizeHistoryItem = (item: unknown): SearchHistoryItem | null => {
+    if (typeof item !== 'object' || item === null) return null;
+    if (!('query' in item) || typeof item.query !== 'string') return null;
+    if (!('timestamp' in item) || typeof item.timestamp !== 'number') return null;
+
+    const frequency =
+        'frequency' in item && typeof item.frequency === 'number' ? item.frequency : 1;
+
+    const isFavorite =
+        'isFavorite' in item && typeof item.isFavorite === 'boolean' ? item.isFavorite : false;
+
+    // type이 없거나 잘못됐으면 query를 분석해서 자동 판정
+    const type =
+        'type' in item &&
+        typeof item.type === 'string' &&
+        ['kanji', 'word', 'mixed'].includes(item.type)
+            ? (item.type as SearchHistoryItem['type'])
+            : getSearchType(item.query);
+
+    return { query: item.query, timestamp: item.timestamp, frequency, isFavorite, type };
+};
+
+export const useSearchHistory = () => {
+    // 지연 초기화로 첫 렌더부터 저장된 기록 사용
+    const [history, setHistory] = useState<SearchHistoryItem[]>(() =>
+        readStorageArray(STORAGE_KEY, normalizeHistoryItem)
+    );
+
+    // 기록이 바뀔 때마다 저장 (state updater 안에서 부수효과를 일으키지 않도록 effect로 분리)
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            setHistory(JSON.parse(stored));
+        if (history.length > 0) {
+            writeStorage(STORAGE_KEY, history);
+        } else {
+            removeStorage(STORAGE_KEY);
         }
-    }, []);
+    }, [history]);
 
     const addToHistory = (query: string) => {
-        const isKanjiSearch = hasKanji(query);
-        const isKanjiOnly = isOnlyKanji(query);
-
         setHistory((prev) => {
             const existingItem = prev.find((item) => item.query === query);
             const filtered = prev.filter((item) => item.query !== query);
@@ -34,28 +64,23 @@ export const useSearchHistory = () => {
                 timestamp: Date.now(),
                 frequency: existingItem ? existingItem.frequency + 1 : 1,
                 isFavorite: existingItem ? existingItem.isFavorite : false,
-                type: isKanjiOnly ? 'kanji' : isKanjiSearch ? 'mixed' : 'word',
+                type: getSearchType(query),
             };
 
-            const newHistory = [newItem, ...filtered].slice(0, 50);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
-            return newHistory;
+            return [newItem, ...filtered].slice(0, 50);
         });
     };
 
     const clearHistory = () => {
         setHistory([]);
-        localStorage.removeItem(STORAGE_KEY);
     };
 
     const toggleFavorite = (query: string) => {
-        setHistory((prev) => {
-            const newHistory = prev.map((item) =>
+        setHistory((prev) =>
+            prev.map((item) =>
                 item.query === query ? { ...item, isFavorite: !item.isFavorite } : item
-            );
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
-            return newHistory;
-        });
+            )
+        );
     };
 
     const getFrequentItems = () => {
@@ -67,11 +92,7 @@ export const useSearchHistory = () => {
     };
 
     const removeFromHistory = (query: string) => {
-        setHistory((prev) => {
-            const newHistory = prev.filter((item) => item.query !== query);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
-            return newHistory;
-        });
+        setHistory((prev) => prev.filter((item) => item.query !== query));
     };
 
     // JSON 내보내기/가져오기 기능
@@ -101,46 +122,9 @@ export const useSearchHistory = () => {
         if (!data || typeof data !== 'object') return { isValid: false };
         if (!('history' in data) || !Array.isArray(data.history)) return { isValid: false };
 
-        const cleanedHistory: SearchHistoryItem[] = [];
-
-        for (const item of data.history) {
-            if (typeof item !== 'object' || item === null) continue;
-            if (!('query' in item) || typeof item.query !== 'string') continue;
-            if (!('timestamp' in item) || typeof item.timestamp !== 'number') continue;
-
-            // 누락된 필드들을 기본값으로 채우기
-            const frequency =
-                'frequency' in item && typeof item.frequency === 'number' && item.frequency !== null
-                    ? item.frequency
-                    : 1;
-
-            const isFavorite =
-                'isFavorite' in item && typeof item.isFavorite === 'boolean'
-                    ? item.isFavorite
-                    : false;
-
-            // type 필드 자동 판정
-            let type: 'kanji' | 'word' | 'mixed' = 'word';
-            if (
-                'type' in item &&
-                typeof item.type === 'string' &&
-                ['kanji', 'word', 'mixed'].includes(item.type)
-            ) {
-                type = item.type as 'kanji' | 'word' | 'mixed';
-            } else {
-                // type이 없으면 query를 분석해서 자동 판정
-                const isKanjiSearch = hasKanji(item.query);
-                type = isOnlyKanji(item.query) ? 'kanji' : isKanjiSearch ? 'mixed' : 'word';
-            }
-
-            cleanedHistory.push({
-                query: item.query,
-                timestamp: item.timestamp,
-                frequency,
-                isFavorite,
-                type,
-            });
-        }
+        const cleanedHistory = data.history
+            .map(normalizeHistoryItem)
+            .filter((item): item is SearchHistoryItem => item !== null);
 
         return { isValid: cleanedHistory.length > 0, cleanedHistory };
     };
@@ -201,7 +185,6 @@ export const useSearchHistory = () => {
                                 .slice(0, 50);
                         }
 
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
                         return newHistory;
                     });
 

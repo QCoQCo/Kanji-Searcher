@@ -37,6 +37,7 @@ const SearchPage: React.FC = () => {
         loading,
         selectedWord,
         searchSource,
+        hasSearched,
         handleSearch,
         handleWordClick,
         handleManualSearch,
@@ -73,6 +74,12 @@ const SearchPage: React.FC = () => {
     // 새로운 manual 검색 시 선택된 word 초기화
     const handleManualSearchWrapper = (q?: string) => {
         handleManualSearch(q || query);
+    };
+
+    // 검색 기록 클릭: 검색창에도 해당 검색어를 채운 뒤 검색
+    const handleHistorySelect = (term: string) => {
+        setQuery(term);
+        handleManualSearchWrapper(term);
     };
 
     // 브레드크럼 네비게이션 핸들러
@@ -144,7 +151,7 @@ const SearchPage: React.FC = () => {
             <JLPTFilter selectedLevels={selectedLevels} onLevelChange={onLevelChange} />
             <SearchHistory
                 history={history}
-                onSelect={(term) => handleManualSearch(term)}
+                onSelect={handleHistorySelect}
                 onClear={clearHistory}
                 onToggleFavorite={toggleFavorite}
                 getFrequentItems={getFrequentItems}
@@ -189,7 +196,7 @@ const SearchPage: React.FC = () => {
                             <KanjiList results={kanjiResults} />
                             <RelatedWords
                                 currentKanji={kanjiResults.map((k) => k.kanji)}
-                                onWordClick={handleWordClick}
+                                onWordClick={handleWordClickWrapper}
                                 currentJLPTLevels={getActiveLevels()}
                             />
                         </div>
@@ -209,13 +216,21 @@ const SearchPage: React.FC = () => {
                         </div>
                     )}
 
-                    {kanjiResults.length === 0 && wordResults.length === 0 && (
-                        <div className='no-results'>
-                            <div className='no-results-icon'>🔍</div>
-                            <h3>검색 결과가 없습니다</h3>
-                            <p>다른 키워드로 검색해보세요</p>
-                        </div>
-                    )}
+                    {kanjiResults.length === 0 &&
+                        wordResults.length === 0 &&
+                        (hasSearched ? (
+                            <div className='no-results'>
+                                <div className='no-results-icon'>🔍</div>
+                                <h3>검색 결과가 없습니다</h3>
+                                <p>다른 키워드로 검색해보세요</p>
+                            </div>
+                        ) : (
+                            <div className='no-results'>
+                                <div className='no-results-icon'>🈁</div>
+                                <h3>한자나 단어를 검색해보세요</h3>
+                                <p>예: 水, 日本語, たべる, water</p>
+                            </div>
+                        ))}
                 </>
             )}
 
