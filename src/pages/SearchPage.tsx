@@ -57,7 +57,8 @@ const SearchPage: React.FC = () => {
         breadcrumb.addBreadcrumbItem(
             extractedKanji,
             isKanjiClick ? 'kanji-click' : 'word-click',
-            wordObj
+            wordObj,
+            wordResults // 돌아왔을 때 같은 단어 목록을 보여주기 위해 함께 저장
         );
 
         handleWordClick(wordObj, extractedKanji);
@@ -90,7 +91,7 @@ const SearchPage: React.FC = () => {
         if (navigatedItem.type === 'word-click' || navigatedItem.type === 'kanji-click') {
             if (navigatedItem.word) {
                 // 당시 클릭한 단어를 선택 단어로 복원 (다른 단어의 배너가 남지 않도록)
-                handleWordClick(navigatedItem.word, navigatedItem.query);
+                handleWordClick(navigatedItem.word, navigatedItem.query, navigatedItem.wordResults);
             } else {
                 handleSearch(navigatedItem.query, 'word-click');
             }

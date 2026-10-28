@@ -1,25 +1,33 @@
 import { useState, useCallback } from 'react';
 import type { BreadcrumbItem, SearchSource, WordData } from '../types/kanji';
 
+// 검색 경로에 남기는 최대 항목 수 (오래된 것부터 제거)
+const MAX_BREADCRUMB_ITEMS = 10;
+
 export function useBreadcrumb() {
     const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
 
     // 브레드크럼에 새 항목 추가
     const addBreadcrumbItem = useCallback(
-        (query: string, type: SearchSource, sourceData?: WordData) => {
+        (query: string, type: SearchSource, sourceData?: WordData, wordResults?: WordData[]) => {
             const newItem: BreadcrumbItem = {
                 id: `${Date.now()}-${Math.random()}`,
                 label: generateLabel(query, type, sourceData),
                 query,
                 type,
                 word: sourceData,
+                wordResults,
                 timestamp: Date.now(),
             };
 
             setBreadcrumbItems((prev) => {
-                // 같은 쿼리가 이미 있으면 제거하고 새로 추가 (최신으로 이동)
-                const filtered = prev.filter((item) => item.query !== query);
-                return [...filtered, newItem];
+                const last = prev[prev.length - 1];
+                // 직전 항목과 같은 검색(종류+검색어)이면 새로 쌓지 않고 최신 정보로 교체 (id는 유지)
+                if (last && last.type === type && last.query === query) {
+                    return [...prev.slice(0, -1), { ...newItem, id: last.id }];
+                }
+                // 그 외에는 지나온 경로를 그대로 두고 뒤에 추가, 최대 개수를 넘으면 오래된 것부터 제거
+                return [...prev, newItem].slice(-MAX_BREADCRUMB_ITEMS);
             });
         },
         []

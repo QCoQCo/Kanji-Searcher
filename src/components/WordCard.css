@@ -1,26 +1,41 @@
-.word-card {
+/* Random Words 단어 카드
+ * 이전에는 WordList.css와 같은 .word-card 이름을 써서 두 파일 스타일이 섞여 적용됐음.
+ * 분리하면서 당시 실제로 보이던 값(너비 280px·그림자·flex 배치·hover 효과 등)을 그대로 옮김 */
+.vocab-card {
     position: relative;
+    width: 280px;
     background: #333;
+    color: #fff;
     border: 1px solid #e5e5e5;
     border-radius: 16px;
     padding: 1.8rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
     text-align: center;
     animation: fadeIn 0.3s ease;
 }
 
-.word-card.flashcard {
+.vocab-card:hover {
+    transform: translateY(-4px);
+}
+
+.vocab-card.flashcard {
     cursor: pointer;
     transition:
         box-shadow 0.2s ease,
         transform 0.2s ease;
 }
 
-.word-card.flashcard:hover {
+.vocab-card.flashcard:hover {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
 }
 
-.word-card.flashcard:focus-visible {
+.vocab-card.flashcard:focus-visible {
     outline: 2px solid #00ff88;
     outline-offset: 3px;
 }
@@ -57,8 +72,16 @@
     font-style: italic;
 }
 
+@media (max-width: 768px) {
+    /* 높이는 고정하지 않음 (이전에는 검색 카드용 height: 230px/210px이 섞여 들어와 모바일에서 내용이 잘렸음) */
+    .vocab-card {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+
 /* 여러 장 그리드에서는 카드 내부 요소를 컴팩트하게 */
-.words-grid.multi .word-card {
+.words-grid.multi .vocab-card {
     padding: 2rem 1.25rem 1.25rem;
 }
 

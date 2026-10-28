@@ -8,23 +8,28 @@
     gap: 12px;
 }
 
-.word-card {
+/* 검색 결과 단어 카드
+ * 이전에는 WordCard.css와 같은 .word-card 이름을 써서 두 파일 스타일이 섞여 적용됐음.
+ * 분리하면서 당시 실제로 보이던 값(배경·테두리색·모서리·여백·가운데 정렬·등장 애니메이션)을 그대로 옮김 */
+.search-word-card {
+    position: relative;
     width: 280px;
-    /* height: 250px; */
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 1.8rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease-in-out;
-    background: #404040;
+    background: #333;
     color: #fff;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
 }
 
-.word-card h2 {
+.search-word-card h2 {
     color: #fff;
     /* margin: 0 0 12px 0; */
     font-size: 1.4rem;
@@ -38,7 +43,7 @@
     -webkit-box-orient: vertical;
 }
 
-.word-card-content {
+.search-word-card-content {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -47,18 +52,18 @@
     max-height: 150px;
 }
 
-.word-card-content > div {
+.search-word-card-content > div {
     font-size: 0.9rem;
     line-height: 1.4;
     word-break: break-word;
 }
 
-.word-card-content .reading {
+.search-word-card-content .reading {
     color: #b3d9ff;
     font-weight: 500;
 }
 
-.word-card-content .meaning {
+.search-word-card-content .meaning {
     color: #e6e6e6;
     max-height: 40px;
     overflow: hidden;
@@ -67,30 +72,30 @@
     -webkit-box-orient: vertical;
 }
 
-.word-card-content .jlpt {
+.search-word-card-content .jlpt {
     color: #ffcc99;
     font-weight: 600;
     font-size: 0.85rem;
 }
 
 /* 에러 카드 스타일 */
-.word-card.error {
+.search-word-card.error {
     border-color: #ff4444;
     background: rgba(255, 68, 68, 0.1);
     color: #ff4444;
 }
 
-.word-card.error h2 {
+.search-word-card.error h2 {
     color: #ff4444;
     margin-bottom: 8px;
 }
 
-.word-card:hover {
+.search-word-card:hover {
     transform: translateY(-4px);
 }
 
 /* 클릭 가능한 카드 스타일 */
-.word-card.clickable {
+.search-word-card.clickable {
     cursor: pointer;
     border-color: #00ff88;
     background: rgba(0, 255, 136, 0.05);
@@ -98,32 +103,32 @@
 }
 
 /* 선택된 카드 스타일 */
-.word-card.selected {
+.search-word-card.selected {
     border-color: #ff6b35;
     background: rgba(255, 107, 53, 0.1);
     box-shadow: 0 0 12px rgba(255, 107, 53, 0.3);
     transform: translateY(-2px);
 }
 
-.word-card.selected:hover {
+.search-word-card.selected:hover {
     border-color: #ff5722;
     background: rgba(255, 107, 53, 0.15);
     box-shadow: 0 2px 16px rgba(255, 107, 53, 0.4);
 }
 
-.word-card.clickable:hover {
+.search-word-card.clickable:hover {
     transform: translateY(-6px);
     box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
     border-color: #00e67a;
     background: rgba(0, 255, 136, 0.1);
 }
 
-.word-card.clickable:focus-visible {
+.search-word-card.clickable:focus-visible {
     outline: 2px solid #00ff88;
     outline-offset: 3px;
 }
 
-.word-card.clickable:active {
+.search-word-card.clickable:active {
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
 }
@@ -218,7 +223,7 @@
     box-shadow: 0 1px 2px rgba(255, 107, 53, 0.3);
 }
 
-.word-card.clickable .kanji-section {
+.search-word-card.clickable .kanji-section {
     animation: pulse 2s infinite;
 }
 
@@ -247,7 +252,7 @@
         padding: 0 16px;
     }
 
-    .word-card {
+    .search-word-card {
         width: 100%;
         max-width: 320px;
         height: 230px;
@@ -259,21 +264,20 @@
         padding: 0 12px;
     }
 
-    .word-card {
-        padding: 12px;
+    .search-word-card {
         height: 210px;
     }
 
-    .word-card h2 {
+    .search-word-card h2 {
         font-size: 1.2rem;
         max-height: 50px;
     }
 
-    .word-card-content {
+    .search-word-card-content {
         max-height: 130px;
     }
 
-    .word-card-content > div {
+    .search-word-card-content > div {
         font-size: 0.85rem;
     }
 

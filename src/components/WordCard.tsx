@@ -41,7 +41,7 @@ const WordCard: React.FC<WordCardProps> = ({ word, mode, front, isSaved, onToggl
 
     return (
         <div
-            className={`word-card ${isFlashcard ? 'flashcard' : ''}`}
+            className={`vocab-card ${isFlashcard ? 'flashcard' : ''}`}
             onClick={handleCardClick}
             // 플래시카드는 키보드(Tab → Enter/Space)로도 뒤집기 가능, 뒤집힘 상태를 aria-pressed로 알림
             role={isFlashcard ? 'button' : undefined}

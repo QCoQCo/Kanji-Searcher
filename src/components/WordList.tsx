@@ -37,7 +37,7 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                 if (!item || typeof item !== 'object') {
                     console.warn(`Invalid item at index ${idx}:`, item);
                     return (
-                        <div key={idx} className='word-card error'>
+                        <div key={idx} className='search-word-card error'>
                             <h2>❌ 잘못된 데이터</h2>
                             <div>데이터 구조가 올바르지 않습니다.</div>
                         </div>
@@ -52,7 +52,7 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                 return (
                     <div
                         key={idx}
-                        className={`word-card ${isClickable ? 'clickable' : ''} ${
+                        className={`search-word-card ${isClickable ? 'clickable' : ''} ${
                             isSelected ? 'selected' : ''
                         }`}
                         onClick={() => isClickable && handleWordClick(item)}
@@ -66,7 +66,7 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                                 : undefined
                         }
                     >
-                        <div className='word-card-content'>
+                        <div className='search-word-card-content'>
                             <h2>
                                 {item.japanese?.[0]?.word || item.japanese?.[0]?.reading || '읽기 없음'}
                             </h2>

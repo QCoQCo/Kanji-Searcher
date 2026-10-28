@@ -19,7 +19,7 @@ interface SearchOptions {
 
 interface UseSearchReturn extends SearchState {
     handleSearch: (query: string, source?: SearchSource, options?: SearchOptions) => Promise<void>;
-    handleWordClick: (wordObj: WordData, extractedKanji: string) => void;
+    handleWordClick: (wordObj: WordData, extractedKanji: string, restoreWordResults?: WordData[]) => void;
     handleManualSearch: (query?: string, options?: SearchOptions) => void;
 }
 
@@ -129,8 +129,13 @@ export function useSearch(
     );
 
     const handleWordClick = useCallback(
-        (wordObj: WordData, extractedKanji: string) => {
-            setState((prev) => ({ ...prev, selectedWord: wordObj }));
+        (wordObj: WordData, extractedKanji: string, restoreWordResults?: WordData[]) => {
+            setState((prev) => ({
+                ...prev,
+                selectedWord: wordObj,
+                // 브레드크럼으로 돌아갈 때는 클릭 당시의 단어 목록을 복원 (word-click 검색은 목록을 새로 가져오지 않음)
+                wordResults: restoreWordResults ?? prev.wordResults,
+            }));
             handleSearch(extractedKanji, 'word-click');
         },
         [handleSearch]

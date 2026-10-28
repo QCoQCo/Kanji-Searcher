@@ -58,5 +58,6 @@ export interface BreadcrumbItem {
     query: string;
     type: SearchSource;
     word?: WordData; // 단어 클릭으로 생긴 항목이면 클릭한 단어 (돌아갈 때 선택 단어 복원용)
+    wordResults?: WordData[]; // 단어 클릭 당시 화면의 단어 목록 (돌아갈 때 목록 복원용)
     timestamp: number;
 }
