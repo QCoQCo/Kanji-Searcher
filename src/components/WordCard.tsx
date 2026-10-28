@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { WordData } from '../types/kanji';
 import { formatJLPT } from '../utils/jlpt';
+import { handleActivationKey } from '../utils/a11y';
 import './WordCard.css';
 
 export type CardDisplayMode = 'full' | 'flashcard';
@@ -42,6 +43,11 @@ const WordCard: React.FC<WordCardProps> = ({ word, mode, front, isSaved, onToggl
         <div
             className={`word-card ${isFlashcard ? 'flashcard' : ''}`}
             onClick={handleCardClick}
+            // 플래시카드는 키보드(Tab → Enter/Space)로도 뒤집기 가능, 뒤집힘 상태를 aria-pressed로 알림
+            role={isFlashcard ? 'button' : undefined}
+            tabIndex={isFlashcard ? 0 : undefined}
+            aria-pressed={isFlashcard ? revealed : undefined}
+            onKeyDown={isFlashcard ? (e) => handleActivationKey(e, handleCardClick) : undefined}
         >
             <button
                 onClick={handleSaveClick}

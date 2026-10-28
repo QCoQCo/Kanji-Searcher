@@ -2,7 +2,8 @@ import React from 'react';
 import './WordList.css';
 import { extractKanjiFromWordObject, hasKanji, getUniqueKanji } from '../utils/kanjiExtractor';
 import { formatJLPT } from '../utils/jlpt';
-import { getWordKey } from '../hooks/useWordBank';
+import { getWordKey } from '../utils/word';
+import { handleActivationKey } from '../utils/a11y';
 import type { WordData } from '../types/kanji';
 
 interface WordListProps {
@@ -55,6 +56,15 @@ const WordList: React.FC<WordListProps> = ({ results, onWordClick, selectedWord 
                             isSelected ? 'selected' : ''
                         }`}
                         onClick={() => isClickable && handleWordClick(item)}
+                        // 클릭 가능한 카드는 키보드(Tab → Enter/Space)로도 선택 가능
+                        role={isClickable ? 'button' : undefined}
+                        tabIndex={isClickable ? 0 : undefined}
+                        aria-pressed={isClickable ? isSelected : undefined}
+                        onKeyDown={
+                            isClickable
+                                ? (e) => handleActivationKey(e, () => handleWordClick(item))
+                                : undefined
+                        }
                     >
                         <div className='word-card-content'>
                             <h2>

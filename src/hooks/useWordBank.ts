@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { WordData } from '../types/kanji';
 import { readStorageArray, writeStorage, removeStorage } from '../utils/storage';
+import { getWordKey } from '../utils/word';
 
 export interface WordBankItem {
     key: string;
@@ -9,12 +10,6 @@ export interface WordBankItem {
 }
 
 const STORAGE_KEY = 'kanjiWordBank';
-
-// 단어의 고유 키: 표기|읽기 조합 (가나 단어는 표기가 없으므로 읽기만으로 구분)
-export const getWordKey = (word: WordData): string => {
-    const jp = word.japanese[0];
-    return `${jp?.word || ''}|${jp?.reading || ''}`;
-};
 
 // 저장된 항목 중 화면에서 쓰는 필드가 올바른 것만 사용
 const isWordBankItem = (item: unknown): item is WordBankItem => {

@@ -54,19 +54,6 @@
     font-size: 0.95rem;
 }
 
-.kanji-related-words {
-    width: 100%;
-    text-align: left;
-}
-
-.kanji-related-words-list {
-    padding-left: 18px;
-}
-
-.kanji-related-words-list li {
-    font-size: 0.97rem;
-}
-
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .kanji-list {
@@ -119,13 +106,5 @@
     .kanji-jlpt,
     .kanji-stroke-count {
         font-size: 0.8rem;
-    }
-
-    .kanji-related-words-list {
-        padding-left: 14px;
-    }
-
-    .kanji-related-words-list li {
-        font-size: 0.9rem;
     }
 }

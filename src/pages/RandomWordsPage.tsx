@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRandomWords } from '../hooks/useRandomWords';
-import { useWordBank, getWordKey } from '../hooks/useWordBank';
+import { useWordBank } from '../hooks/useWordBank';
+import { getWordKey } from '../utils/word';
 import WordCard from '../components/WordCard';
 import type { CardDisplayMode, CardFront } from '../components/WordCard';
 import type { JLPTLevel } from '../types/kanji';

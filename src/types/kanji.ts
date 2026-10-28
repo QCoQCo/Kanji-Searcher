@@ -9,11 +9,6 @@ export interface KanjiData {
     meanings: string[];
     jlpt: JLPTLevel | null;
     stroke_count: number;
-    related_words: {
-        word: string;
-        reading: string;
-        meanings: string[];
-    }[];
 }
 
 // Jisho API 응답 타입들
@@ -62,5 +57,6 @@ export interface BreadcrumbItem {
     label: string;
     query: string;
     type: SearchSource;
+    word?: WordData; // 단어 클릭으로 생긴 항목이면 클릭한 단어 (돌아갈 때 선택 단어 복원용)
     timestamp: number;
 }

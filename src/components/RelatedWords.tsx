@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './RelatedWords.css';
-import { searchKanji } from '../apis/jishoApi';
+import { searchWords } from '../apis/jishoApi';
 import { extractKanjiFromWordObject } from '../utils/kanjiExtractor';
 import { formatJLPT, matchesJLPTLevels } from '../utils/jlpt';
-import { getWordKey } from '../hooks/useWordBank';
+import { getWordKey } from '../utils/word';
 import type { WordData } from '../types/kanji';
 
 interface RelatedWordsProps {
@@ -39,7 +39,7 @@ const RelatedWords: React.FC<RelatedWordsProps> = ({
             const results = await Promise.all(
                 kanjiList.map(async (kanji) => {
                     try {
-                        const data = await searchKanji(kanji);
+                        const data = await searchWords(kanji);
                         return (data.data || []) as WordData[];
                     } catch (error) {
                         console.error(`Error fetching related words for ${kanji}:`, error);

@@ -88,9 +88,15 @@ const SearchPage: React.FC = () => {
         setQuery(navigatedItem.query);
 
         if (navigatedItem.type === 'word-click' || navigatedItem.type === 'kanji-click') {
-            handleSearch(navigatedItem.query, 'word-click');
+            if (navigatedItem.word) {
+                // 당시 클릭한 단어를 선택 단어로 복원 (다른 단어의 배너가 남지 않도록)
+                handleWordClick(navigatedItem.word, navigatedItem.query);
+            } else {
+                handleSearch(navigatedItem.query, 'word-click');
+            }
         } else {
-            handleManualSearch(navigatedItem.query);
+            // 되돌아가는 것이므로 검색 기록 횟수를 늘리지 않음
+            handleManualSearch(navigatedItem.query, { silent: true });
         }
     };
 

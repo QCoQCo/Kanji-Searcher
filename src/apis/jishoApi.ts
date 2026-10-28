@@ -18,7 +18,8 @@ const getKanjiInfoUrl = (kanji: string) => {
         : `/.netlify/functions/kanji-info?kanji=${encoded}`;
 };
 
-export const searchKanji = async (keyword: string): Promise<JishoApiResponse> => {
+// Jisho 단어 검색 (한자·가나·영어 키워드 모두 가능)
+export const searchWords = async (keyword: string): Promise<JishoApiResponse> => {
     try {
         const response = await axios.get<JishoApiResponse>(getWordSearchUrl(keyword));
         return response.data;

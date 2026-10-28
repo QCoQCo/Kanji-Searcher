@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { searchKanji, fetchKanjiInfo } from '../apis/jishoApi';
+import { searchWords, fetchKanjiInfo } from '../apis/jishoApi';
 import { isKanji } from '../utils/kanjiExtractor';
 import type { KanjiData, KanjiApiResponse, WordData, SearchSource, JLPTLevel } from '../types/kanji';
 
@@ -12,11 +12,15 @@ interface SearchState {
     hasSearched: boolean; // 검색을 한 번이라도 완료했는지 (첫 화면 안내 표시용)
 }
 
+interface SearchOptions {
+    // true면 완료 콜백(검색 기록·브레드크럼 추가)을 호출하지 않음 (브레드크럼으로 되돌아갈 때)
+    silent?: boolean;
+}
+
 interface UseSearchReturn extends SearchState {
-    handleSearch: (query: string, source?: SearchSource) => Promise<void>;
+    handleSearch: (query: string, source?: SearchSource, options?: SearchOptions) => Promise<void>;
     handleWordClick: (wordObj: WordData, extractedKanji: string) => void;
-    handleManualSearch: (query?: string) => void;
-    clearResults: () => void;
+    handleManualSearch: (query?: string, options?: SearchOptions) => void;
 }
 
 function parseKanjiApiResponse(data: KanjiApiResponse): KanjiData {
@@ -29,7 +33,6 @@ function parseKanjiApiResponse(data: KanjiApiResponse): KanjiData {
         meanings: data.meanings || [],
         jlpt: data.jlpt ? (`N${data.jlpt}` as JLPTLevel) : null,
         stroke_count: data.stroke_count || 0,
-        related_words: [],
     };
 }
 
@@ -55,17 +58,8 @@ export function useSearch(
         onSearchCompleteRef.current = onSearchComplete;
     });
 
-    const clearResults = useCallback(() => {
-        setState((prev) => ({
-            ...prev,
-            kanjiResults: [],
-            wordResults: [],
-            selectedWord: null,
-        }));
-    }, []);
-
     const handleSearch = useCallback(
-        async (query: string, source: SearchSource = 'manual') => {
+        async (query: string, source: SearchSource = 'manual', options: SearchOptions = {}) => {
             if (!query.trim()) return;
 
             const requestId = ++latestRequestIdRef.current;
@@ -78,7 +72,7 @@ export function useSearch(
                 let wordResults: WordData[] = [];
                 if (source !== 'word-click') {
                     try {
-                        const data = await searchKanji(query);
+                        const data = await searchWords(query);
                         wordResults = data.data || [];
                     } catch (error) {
                         console.error('Error searching words:', error);
@@ -116,7 +110,9 @@ export function useSearch(
                     hasSearched: true,
                 }));
 
-                onSearchCompleteRef.current?.(query, source);
+                if (!options.silent) {
+                    onSearchCompleteRef.current?.(query, source);
+                }
             } catch (error) {
                 console.error('Search error:', error);
                 if (isStale()) return;
@@ -141,10 +137,10 @@ export function useSearch(
     );
 
     const handleManualSearch = useCallback(
-        (query?: string) => {
+        (query?: string, options?: SearchOptions) => {
             if (query) {
                 setState((prev) => ({ ...prev, selectedWord: null }));
-                handleSearch(query, 'manual');
+                handleSearch(query, 'manual', options);
             }
         },
         [handleSearch]
@@ -155,6 +151,5 @@ export function useSearch(
         handleSearch,
         handleWordClick,
         handleManualSearch,
-        clearResults,
     };
 }

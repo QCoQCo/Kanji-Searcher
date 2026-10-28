@@ -36,17 +36,6 @@ const KanjiList: React.FC<KanjiListProps> = ({ results }) => {
                             <div className='kanji-meanings'>의미: {kanji.meanings.join(', ')}</div>
                             <div className='kanji-jlpt'>JLPT: {kanji.jlpt ?? '정보 없음'}</div>
                             <div className='kanji-stroke-count'>획수: {kanji.stroke_count}</div>
-                            <div className='kanji-related-words'>
-                                <strong>관련 단어:</strong>
-                                <ul className='kanji-related-words-list'>
-                                    {kanji.related_words.map((word, i) => (
-                                        <li key={i}>
-                                            {word.word} ({word.reading}) -{' '}
-                                            {word.meanings.join(', ')}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 );

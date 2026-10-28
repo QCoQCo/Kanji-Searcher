@@ -12,6 +12,7 @@ export function useBreadcrumb() {
                 label: generateLabel(query, type, sourceData),
                 query,
                 type,
+                word: sourceData,
                 timestamp: Date.now(),
             };
 
@@ -40,18 +41,11 @@ export function useBreadcrumb() {
         setBreadcrumbItems([]);
     }, []);
 
-    // 마지막 항목 제거 (뒤로가기)
-    const goBack = useCallback(() => {
-        setBreadcrumbItems((prev) => prev.slice(0, -1));
-        return breadcrumbItems[breadcrumbItems.length - 2] || null;
-    }, [breadcrumbItems]);
-
     return {
         breadcrumbItems,
         addBreadcrumbItem,
         navigateToBreadcrumbItem,
         clearBreadcrumb,
-        goBack,
     };
 }
 

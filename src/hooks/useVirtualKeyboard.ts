@@ -1,13 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { convertRomaji, convertRomajiToHiragana } from '../utils/romaji';
 
-export interface VirtualKeyboardState {
-    isVisible: boolean;
-    inputBuffer: string;
-    convertedText: string;
-    activeKey: string | null; // 현재 활성화된 키 추적
-}
-
 // 확정된 텍스트와 미확정 로마지 버퍼는 항상 함께 바뀌므로 하나의 state로 관리
 interface InputState {
     convertedText: string;
@@ -24,10 +17,6 @@ export function useVirtualKeyboard() {
 
     const toggleKeyboard = useCallback(() => {
         setIsVisible((prev) => !prev);
-    }, []);
-
-    const showKeyboard = useCallback(() => {
-        setIsVisible(true);
     }, []);
 
     const hideKeyboard = useCallback(() => {
@@ -134,10 +123,6 @@ export function useVirtualKeyboard() {
         };
     }, [isVisible, hideKeyboard, handleAddToBuffer, handleBackspace, handleSpace]);
 
-    const getCurrentText = useCallback(() => {
-        return convertedText + inputBuffer;
-    }, [convertedText, inputBuffer]);
-
     const getFullText = useCallback(() => {
         return convertedText + convertRomajiToHiragana(inputBuffer);
     }, [convertedText, inputBuffer]);
@@ -152,13 +137,11 @@ export function useVirtualKeyboard() {
         convertedText,
         activeKey,
         toggleKeyboard,
-        showKeyboard,
         hideKeyboard,
         addToBuffer,
         backspace,
         clear,
         space,
-        getCurrentText,
         getFullText,
         setText,
     };

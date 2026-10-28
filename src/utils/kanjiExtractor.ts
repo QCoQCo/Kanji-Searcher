@@ -77,23 +77,3 @@ export function extractKanjiFromWordObject(wordObj: WordData | null | undefined)
 export function hasKanji(text: string): boolean {
     return KANJI_REGEX.test(text);
 }
-
-/**
- * 한자 개수 계산
- */
-export function countKanji(text: string): number {
-    return extractKanjiFromText(text).length;
-}
-
-/**
- * 한자와 비한자 문자 분리
- */
-export function separateKanjiAndNonKanji(text: string): {
-    kanji: string[];
-    nonKanji: string;
-} {
-    const kanji = extractKanjiFromText(text);
-    const nonKanji = text.replace(KANJI_REGEX_GLOBAL, '');
-
-    return { kanji, nonKanji };
-}
